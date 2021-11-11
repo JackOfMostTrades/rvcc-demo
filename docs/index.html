@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" integrity="sha384-JKIDqM48bt14NZpzl9v0AP36VK2C/X6RuSPfimxpoWdSANUXblZUX1cgdQw8cZUK" crossorigin="anonymous">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Quicksand:bold">
+    <title>RVCC Demo</title>
+</head>
+<body>
+<!-- Trick to force preload of font -->
+<div style="opacity: 0; height: 0">
+    <svg width="10" height="10" viewBox="0 0 10 10">
+        <text id="website" x="0" y="10" font-size="10" font-weight="bold" font-family="Quicksand, sans-serif">x</text>
+    </svg>
+</div>
+
+<div class="ui container">
+    <h1 class="ui header" style="font-size: 3em">
+        RVCC Demo
+    </h1>
+    <div class="ui segment">
+        <div class="ui grid">
+            <div class="eight wide column">
+                <form id="template-form" class="ui form">
+                    <div class="field">
+                        <label>Website / Social Media</label>
+                        <input type="text" name="website">
+                    </div>
+                    <div class="field">
+                        <label>Program Information</label>
+                        <input type="text" name="program_info">
+                    </div>
+                    <div class="field">
+                        <label>Logo</label>
+                        <input type="file" name="logo">
+                    </div>
+                    <div class="field">
+                        <label>Picture</label>
+                        <input type="file" name="pic">
+                    </div>
+                    <div id="download-png" class="ui labeled icon primary button" tabindex="0"><i class="file image icon"></i> Download PNG</div>
+                </form>
+            </div>
+            <div class="eight wide column">
+                <h2 class="ui header">Preview</h2>
+                <svg id="template-svg" width="100%" viewBox="0 0 1571 2000">
+                    <image href="bg-thumbnail.jpg" x="0" y="0" width="1571" height="2000"/>
+                    <image id="logo" href="" x="1271" y="1453" width="300" height="300"/>
+                    <image id="pic" href="" x="0" y="318" width="1571" height="1435"/>
+                    <rect id="website-bg" x="1571" y="60" width="0" height="0" fill="#ffbd59"></rect>
+                    <text id="website" x="1571" y="75" text-anchor="end" font-size="75" font-weight="bold" font-family="Quicksand, sans-serif"></text>
+                    <text id="program_info" x="785" y="1970" text-anchor="middle" font-size="90" fill="white" font-weight="bold" font-family="Quicksand, sans-serif"></text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="//code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
+<script src="//cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js" integrity="sha384-HtPdw6a7QeUoz9fgdEIk3iL4WifPUg7BuiWndgaxmBDiCHMYfOO2nEJ9J3YPg6+S" crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/canvg/3.0.7/umd.min.js" integrity="sha384-4SlT5D+J6ukRvFBVMV4o95COWMibALdb03ZMhbYwPEAOLHe/S2n4Rj2/ci80B1dz" crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+    function setInnerText(elem, txt, bgRect) {
+        while (elem.firstChild) {
+            elem.removeChild(elem.firstChild);
+        }
+        elem.appendChild(document.createTextNode(txt));
+
+        if (bgRect) {
+            var bbox = elem.getBBox();
+            bgRect.setAttribute("x", bbox.x - 5);
+            bgRect.setAttribute("y", bbox.y - 5);
+            bgRect.setAttribute("width", bbox.width + 10);
+            bgRect.setAttribute("height", bbox.height + 10);
+        }
+    }
+    function setImage(elem, files) {
+        if (files.length === 0) {
+            return;
+        }
+        var file = files[0];
+        if (file.type && !file.type.startsWith('image/')) {
+            alert("File is not an image: " + file.type);
+            return;
+        }
+        var reader = new FileReader();
+        reader.addEventListener('load', function(e) {
+            elem.setAttribute('href', e.target.result);
+        });
+        reader.readAsDataURL(file);
+    }
+    function redrawAll() {
+        var svg = document.getElementById('template-svg');
+        setInnerText(svg.getElementById('website'), $('#template-form input[name="website"]').val(), svg.getElementById('website-bg'));
+        setInnerText(svg.getElementById('program_info'), $('#template-form input[name="program_info"]').val());
+        setImage(svg.getElementById('logo'), $('#template-form input[name="logo"]')[0].files);
+        setImage(svg.getElementById('pic'), $('#template-form input[name="pic"]')[0].files);
+    }
+
+    $(document).ready(function() {
+        var svg = document.getElementById('template-svg');
+        $('#template-form input[name="website"]').keyup(function(e) {
+            setInnerText(svg.getElementById('website'), e.target.value, svg.getElementById('website-bg'));
+        });
+        $('#template-form input[name="program_info"]').keyup(function(e) {
+            setInnerText(svg.getElementById('program_info'), e.target.value);
+        });
+        $('#template-form input[name="logo"]').change(function(e) {
+            setImage(svg.getElementById('logo'), e.target.files);
+        });
+        $('#template-form input[name="pic"]').change(function(e) {
+            setImage(svg.getElementById('pic'), e.target.files);
+        });
+        $('#download-png').click(function() {
+            var canvas = document.createElement("canvas");
+            canvas.width = 1571;
+            canvas.height = 2000;
+            var svgString = svg.outerHTML;
+            svgString = svgString.replaceAll('href="bg-thumbnail.jpg"', 'href="bg.png"');
+
+            var ctx = canvas.getContext("2d");
+            var v = canvg.Canvg.fromString(ctx, svgString);
+            v.start();
+            v.ready().then(function(){
+                var image = canvas.toDataURL("image/png");
+                var link = document.createElement("a");
+                link.download = 'foo.png';
+                link.href = image;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        });
+        redrawAll();
+    });
+</script>
+
+</body>
+</html>
