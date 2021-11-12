@@ -34,19 +34,44 @@
                     </div>
                     <div class="field">
                         <label>Logo</label>
-                        <input type="file" name="logo">
+                        <div class="ui grid">
+                            <div class="thirteen wide column">
+                                <input type="file" name="logo">
+                            </div>
+                            <div class="three wide column">
+                                <div id="logo-preview" class="ui tiny bordered image">
+                                    <a class="ui red right corner label hidden">
+                                        <i class="close icon"></i>
+                                    </a>
+                                    <img src="wireframe.png">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="field">
                         <label>Picture</label>
-                        <input type="file" name="pic">
+                        <div class="ui grid">
+                            <div class="thirteen wide column">
+                                <input type="file" name="pic">
+                            </div>
+                            <div class="three wide column">
+                                <div id="pic-preview" class="ui tiny bordered image">
+                                    <a class="ui red right corner label hidden">
+                                        <i class="close icon"></i>
+                                    </a>
+                                    <img src="wireframe.png">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="download-png" class="ui labeled icon primary button" tabindex="0"><i class="file image icon"></i> Download PNG</div>
+                    <div id="download-png" class="ui labeled icon primary button" tabindex="0"><i class="download icon"></i> Download PNG</div>
                 </form>
             </div>
             <div class="eight wide column">
                 <h2 class="ui header">Preview</h2>
                 <svg id="template-svg" width="100%" viewBox="0 0 1571 2000">
                     <image href="bg-thumbnail.jpg" x="0" y="0" width="1571" height="2000"/>
+                    <rect id="logo-bg" x="0" y="0" width="0" height="0" fill="#ffbd59"></rect>
                     <image id="logo" href="" x="1271" y="1453" width="300" height="300"/>
                     <image id="pic" href="" x="0" y="318" width="1571" height="1435"/>
                     <rect id="website-bg" x="1571" y="60" width="0" height="0" fill="#ffbd59"></rect>
@@ -77,27 +102,53 @@
             bgRect.setAttribute("height", bbox.height + 10);
         }
     }
-    function setImage(elem, files) {
-        if (files.length === 0) {
-            return;
+    function setImage(elem, bg, files, previewDiv) {
+        if (files && files.length > 0) {
+            var file = files[0];
+            if (file.type && !file.type.startsWith('image/')) {
+                alert("File is not an image: " + file.type);
+                return;
+            }
+            var reader = new FileReader();
+            reader.addEventListener('load', function (e) {
+                elem.setAttribute('href', e.target.result);
+
+                if (bg) {
+                    var bbox = elem.getBBox();
+                    bg.setAttribute("x", bbox.x);
+                    bg.setAttribute("y", bbox.y);
+                    bg.setAttribute("width", bbox.width);
+                    bg.setAttribute("height", bbox.height);
+                }
+
+                if (previewDiv) {
+                    previewDiv.getElementsByTagName('img')[0].src = e.target.result;
+                    previewDiv.getElementsByTagName('a')[0].classList.remove('hidden');
+                }
+            });
+            reader.readAsDataURL(file);
+        } else {
+            elem.setAttribute('href', '');
+
+            if (bg) {
+                bg.setAttribute("x", 0);
+                bg.setAttribute("y", 0);
+                bg.setAttribute("width", 0);
+                bg.setAttribute("height", 0);
+            }
+
+            if (previewDiv) {
+                previewDiv.getElementsByTagName('img')[0].src = 'wireframe.png';
+                previewDiv.getElementsByTagName('a')[0].classList.add('hidden');
+            }
         }
-        var file = files[0];
-        if (file.type && !file.type.startsWith('image/')) {
-            alert("File is not an image: " + file.type);
-            return;
-        }
-        var reader = new FileReader();
-        reader.addEventListener('load', function(e) {
-            elem.setAttribute('href', e.target.result);
-        });
-        reader.readAsDataURL(file);
     }
     function redrawAll() {
         var svg = document.getElementById('template-svg');
         setInnerText(svg.getElementById('website'), $('#template-form input[name="website"]').val(), svg.getElementById('website-bg'));
         setInnerText(svg.getElementById('program_info'), $('#template-form input[name="program_info"]').val());
-        setImage(svg.getElementById('logo'), $('#template-form input[name="logo"]')[0].files);
-        setImage(svg.getElementById('pic'), $('#template-form input[name="pic"]')[0].files);
+        setImage(svg.getElementById('logo'), svg.getElementById('logo-bg'), $('#template-form input[name="logo"]')[0].files, document.getElementById('logo-preview'));
+        setImage(svg.getElementById('pic'), undefined, $('#template-form input[name="pic"]')[0].files, document.getElementById('pic-preview'));
     }
 
     $(document).ready(function() {
@@ -109,11 +160,18 @@
             setInnerText(svg.getElementById('program_info'), e.target.value);
         });
         $('#template-form input[name="logo"]').change(function(e) {
-            setImage(svg.getElementById('logo'), e.target.files);
+            setImage(svg.getElementById('logo'), svg.getElementById('logo-bg'), e.target.files, document.getElementById("logo-preview"));
         });
         $('#template-form input[name="pic"]').change(function(e) {
-            setImage(svg.getElementById('pic'), e.target.files);
+            setImage(svg.getElementById('pic'), undefined, e.target.files, document.getElementById("pic-preview"));
         });
+        $('#template-form #logo-preview a').click(function(e) {
+            setImage(svg.getElementById('logo'), svg.getElementById('logo-bg'), undefined, document.getElementById('logo-preview'));
+        });
+        $('#template-form #pic-preview a').click(function(e) {
+            setImage(svg.getElementById('pic'), undefined, undefined, document.getElementById('pic-preview'));
+        });
+
         $('#download-png').click(function() {
             var canvas = document.createElement("canvas");
             canvas.width = 1571;
@@ -124,7 +182,9 @@
             var ctx = canvas.getContext("2d");
             var v = canvg.Canvg.fromString(ctx, svgString);
             v.start();
+            document.getElementById('template-form').classList.add('loading');
             v.ready().then(function(){
+                document.getElementById('template-form').classList.remove('loading');
                 var image = canvas.toDataURL("image/png");
                 var link = document.createElement("a");
                 link.download = 'foo.png';
