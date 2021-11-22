@@ -221,24 +221,24 @@ export class ImageElement implements RenderElement {
 }
 
 export interface Renderer<T> {
-    render(children: Array<RenderElement>): T
+    render(width: number, height: number, children: Array<RenderElement>): T
 }
 
 export class ReactRenderer implements Renderer<ReactNode> {
-    render(children: Array<RenderElement>): ReactNode {
+    render(width: number, height: number, children: Array<RenderElement>): ReactNode {
         let reactChildren: Array<ReactNode> = [];
         for (let i = 0; i < children.length; i++) {
             reactChildren.push(children[i].renderToReact(i));
         }
-        return <svg width="100%" viewBox="0 0 1571 2000" children={reactChildren} />;
+        return <svg width="100%" viewBox={`0 0 ${width} ${height}`} children={reactChildren} />;
     }
 }
 
 export class CanvasRenderer implements Renderer<Promise<HTMLCanvasElement>> {
-    render(children: Array<RenderElement>): Promise<HTMLCanvasElement> {
+    render(width: number, height: number, children: Array<RenderElement>): Promise<HTMLCanvasElement> {
         let canvas = document.createElement('canvas');
-        canvas.width = 1571;
-        canvas.height = 2000;
+        canvas.width = width;
+        canvas.height = height;
 
         let chain: Promise<void> = Promise.resolve();
         let ctx = canvas.getContext('2d');
