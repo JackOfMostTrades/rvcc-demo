@@ -1,5 +1,5 @@
 import {Component, ReactNode} from 'react';
-import {Button, Container, Form, Grid, Header, Icon, Input, Segment, TextArea} from "semantic-ui-react";
+import {Button, Container, Form, Grid, Header, Icon, Image, Input, Segment, TextArea} from "semantic-ui-react";
 import {CanvasRenderer, ImageElement, ReactRenderer, RenderElement, TextElement} from "./renderer";
 import {CropBox} from "./cropbox";
 
@@ -28,6 +28,20 @@ interface State {
   cropModalCallback?: (dataUrl: string) => void
 }
 
+class ImageSelectFormField extends Component<{value?: string, clear: () => void, setImage: (files: FileList) => void}, {}> {
+  render() {
+    if (this.props.value) {
+      return <Segment clearing>
+        <Image src={this.props.value} size="tiny" floated="left"/>
+        <Button color="red" floated="right" icon labelPosition="left" onClick={() => this.props.clear()}>
+          <Icon name="x"/>Clear
+        </Button>
+      </Segment>;
+    }
+    return <Input type="file" onChange={e => this.props.setImage(e.target.files)} />;
+  }
+}
+
 export class TemplateForm extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -35,6 +49,7 @@ export class TemplateForm extends Component<Props, State> {
       website: "",
       program_info: "",
     };
+    this.setImage = this.setImage.bind(this);
   }
 
   private reset() {
@@ -129,11 +144,11 @@ export class TemplateForm extends Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <label>Logo</label>
-                  <Input type="file" onChange={e => this.setImage('logo', e.target.files)} />
+                  <ImageSelectFormField value={this.state.logo} clear={() => this.setState({logo: undefined})} setImage={(files) => this.setImage('logo', files)} />
                 </Form.Field>
                 <Form.Field>
                   <label>Picture</label>
-                  <Input type="file" onChange={e => this.setImage('pic', e.target.files)} />
+                  <ImageSelectFormField value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
                 </Form.Field>
                 <Button type="button" color="black" onClick={() => this.reset()}>Reset</Button>
                 <Button type="button" primary icon labelPosition="left" onClick={() => this.downloadPng()}><Icon name="download" />Download (PNG)</Button>
