@@ -1,5 +1,5 @@
 import {Component, ReactNode} from 'react';
-import {Button, Container, Form, Grid, Header, Icon, Input, Segment} from "semantic-ui-react";
+import {Button, Container, Form, Grid, Header, Icon, Input, Segment, TextArea} from "semantic-ui-react";
 import {CanvasRenderer, ImageElement, ReactRenderer, RenderElement, TextElement} from "./renderer";
 import {CropBox} from "./cropbox";
 
@@ -118,7 +118,14 @@ export class TemplateForm extends Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <label>Program Information</label>
-                  <Input value={this.state.program_info} onChange={e => this.setState({program_info: e.target.value})} />
+                  <TextArea rows={2} style={{resize: 'none'}} value={this.state.program_info} onChange={e => {
+                    let val = e.target.value;
+                    // Enforce maximum of two lines
+                    if (val.split('\n').length > 2) {
+                      return;
+                    }
+                    this.setState({program_info: val});
+                  }} />
                 </Form.Field>
                 <Form.Field>
                   <label>Logo</label>
@@ -128,8 +135,8 @@ export class TemplateForm extends Component<Props, State> {
                   <label>Picture</label>
                   <Input type="file" onChange={e => this.setImage('pic', e.target.files)} />
                 </Form.Field>
-                <Button color="black" onClick={() => this.reset()}>Reset</Button>
-                <Button primary icon labelPosition="left" onClick={() => this.downloadPng()}><Icon name="download" />Download (PNG)</Button>
+                <Button type="button" color="black" onClick={() => this.reset()}>Reset</Button>
+                <Button type="button" primary icon labelPosition="left" onClick={() => this.downloadPng()}><Icon name="download" />Download (PNG)</Button>
               </Form>
             </Grid.Column>
             <Grid.Column width={8}>

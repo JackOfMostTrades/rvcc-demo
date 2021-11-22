@@ -13,6 +13,7 @@ export interface TextElementOptions {
     color?: string,
     fontWeight?: 'bold';
     fontFamily?: string;
+    verticalAlign?: 'top' | 'middle' | 'bottom';
     bgFill?: string;
     bgPadding?: number;
 }
@@ -59,6 +60,12 @@ class BgSvgTextNode extends Component<BgSvgTextNodeProps, {extents?: DOMRect}> {
     }
 }
 
+interface TextElementLine {
+    x: number;
+    y: number;
+    line: string;
+}
+
 export class TextElement implements RenderElement {
     private text: string
     private options: TextElementOptions;
@@ -68,20 +75,53 @@ export class TextElement implements RenderElement {
         this.options = options;
     }
 
+    private getLinesToRender(): Array<TextElementLine> {
+        if (!this.text) {
+            return [];
+        }
+
+        let lines = this.text.split('\n');
+        let height = this.options.fontSize || 0;
+        let lineHeight = height * 1.0;
+        let firstY = this.options.y;
+        if (this.options.verticalAlign === 'middle') {
+            firstY -= lineHeight * (lines.length-1) / 2;
+        } else if (this.options.verticalAlign === 'bottom') {
+            firstY -= lineHeight * (lines.length-1);
+        }
+        let x = this.options.x;
+
+        let result: Array<TextElementLine> = [];
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            let y = firstY + lineHeight * i;
+            result.push({x: x, y: y, line: line});
+        }
+
+        return result;
+    }
+
     renderToReact(key: any): React.ReactNode {
         if (!this.text) {
             return null;
         }
 
-        return <BgSvgTextNode key={key} text={this.text} textProps={{
-            x: this.options.x,
-            y: this.options.y,
-            textAnchor: this.options.textAnchor,
-            fontSize: this.options.fontSize,
-            fill: this.options.color,
-            fontWeight: this.options.fontWeight,
-            fontFamily: this.options.fontFamily,
-        }} bgFill={this.options.bgFill} bgPadding={this.options.bgPadding} />;
+        let lines = this.getLinesToRender();
+        let nodes: Array<ReactNode> = [];
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            nodes.push(<BgSvgTextNode key={key} text={line.line} textProps={{
+                x: line.x,
+                y: line.y,
+                textAnchor: this.options.textAnchor,
+                fontSize: this.options.fontSize,
+                fill: this.options.color,
+                fontWeight: this.options.fontWeight,
+                fontFamily: this.options.fontFamily,
+            }} bgFill={this.options.bgFill} bgPadding={this.options.bgPadding}/>);
+        }
+
+        return <Fragment children={nodes} />;
     }
 
     renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void> {
@@ -107,29 +147,34 @@ export class TextElement implements RenderElement {
             ctx.font = font;
         }
 
-        if (this.options.bgFill) {
-            let metrics = ctx.measureText(this.text);
-            let height = this.options.fontSize || 0;
-            let width = metrics.width;
-            let x = this.options.x;
-            let y = this.options.y - height;
-            if (this.options.textAnchor === 'middle') {
-                x -= width/2;
-            } else if (this.options.textAnchor === 'end') {
-                x -= width;
+        let lines = this.getLinesToRender();
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+
+            if (this.options.bgFill) {
+                let fillX = line.x;
+                let fillHeight = this.options.fontSize || 0;
+                let metrics = ctx.measureText(line.line);
+                let width = metrics.width;
+                if (this.options.textAnchor === 'middle') {
+                    fillX -= width/2;
+                } else if (this.options.textAnchor === 'end') {
+                    fillX -= width;
+                }
+
+                let padding = this.options.bgPadding || 0;
+
+                ctx.fillStyle = this.options.bgFill;
+                ctx.fillRect(fillX - padding, line.y - fillHeight - padding, width + 2*padding, fillHeight + 2*padding);
             }
 
-            ctx.fillStyle = this.options.bgFill;
-            ctx.fillRect(x, y, width, height);
+            if (this.options.color) {
+                ctx.fillStyle = this.options.color;
+            } else {
+                ctx.fillStyle = 'black';
+            }
+            ctx.fillText(line.line, line.x, line.y);
         }
-
-        if (this.options.color) {
-            ctx.fillStyle = this.options.color;
-        } else {
-            ctx.fillStyle = 'black';
-        }
-        ctx.fillText(this.text, this.options.x, this.options.y);
-
         return Promise.resolve();
     }
 }

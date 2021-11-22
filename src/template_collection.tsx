@@ -23,10 +23,10 @@ class CommonTemplateForm extends Component<CommonTemplateFormProps, {}> {
             backgroundThumbnail={this.props.thumbnail}
             backgroundFull={this.props.bg}
             renderChildren={[
-                (state: TemplateState) => new ImageElement(state.logo, {x: 1271, y: 1453, width: 300, height: 300, bgFill: this.props.bgColor}),
                 (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 318, width: 1571, height: 1435}),
-                (state: TemplateState) => new TextElement(state.website, {x: 1571, y: 75, textAnchor: 'end', fontSize: 75, fontWeight: 'bold', fontFamily: 'Quicksand, sans-serify', bgFill: this.props.bgColor, bgPadding: 5}),
-                (state: TemplateState) => new TextElement(state.program_info, {x: 785, y: 1970, textAnchor: 'middle', fontSize: 90, color: 'white', fontWeight: 'bold', fontFamily: 'Quicksand, sans-serify'})
+                (state: TemplateState) => new ImageElement(state.logo, {x: 1271, y: 1453, width: 300, height: 300, bgFill: this.props.bgColor}),
+                (state: TemplateState) => new TextElement(state.website, {x: 1571, y: 55, textAnchor: 'end', fontSize: 55, fontWeight: 'bold', fontFamily: 'Quicksand, sans-serify', bgFill: this.props.bgColor, bgPadding: 5}),
+                (state: TemplateState) => new TextElement(state.program_info, {x: 785, y: 1950, textAnchor: 'middle', fontSize: 60, color: 'white', fontWeight: 'bold', fontFamily: 'Quicksand, sans-serify', verticalAlign: 'middle'})
             ]} />
     }
 }
