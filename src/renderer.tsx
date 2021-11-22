@@ -194,13 +194,7 @@ export class ImageElement implements RenderElement {
         }
 
         let img = new Image(this.options.width, this.options.height);
-        if (this.href === 'bg-thumbnail.jpg') {
-            img.src = 'bg.png';
-        } else {
-            img.src = this.href;
-        }
-
-        return new Promise<void>((resolve, reject) => {
+        let promise = new Promise<void>((resolve, reject) => {
             img.onload = () => {
                 let scale = Math.min(this.options.width / img.naturalWidth, this.options.height / img.naturalHeight);
                 let width = scale * img.naturalWidth;
@@ -215,6 +209,14 @@ export class ImageElement implements RenderElement {
                 reject();
             }
         });
+
+        if (this.href === 'bg-thumbnail.jpg') {
+            img.src = 'bg.png';
+        } else {
+            img.src = this.href;
+        }
+
+        return promise;
     }
 }
 

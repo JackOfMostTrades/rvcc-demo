@@ -2,6 +2,7 @@ import {Component, createElement, ReactNode} from 'react';
 import {render} from "react-dom";
 import {Button, Container, Form, Grid, Header, Icon, Input, Segment} from "semantic-ui-react";
 import {CanvasRenderer, ImageElement, ReactRenderer, RenderElement, TextElement} from "./renderer";
+import {CropBox} from "./cropbox";
 
 interface Props {
 }
@@ -11,6 +12,9 @@ interface State {
   program_info?: string
   logo?: string
   pic?: string
+
+  cropModalHref?: string
+  cropModalCallback?: (dataUrl: string) => void
 }
 
 class Demo extends Component<Props, State> {
@@ -35,7 +39,12 @@ class Demo extends Component<Props, State> {
     }
     let reader = new FileReader();
     reader.addEventListener('load', function (e) {
-      self.setState({[fieldName]: e.target.result})
+      self.setState({
+        cropModalHref: e.target.result as string,
+        cropModalCallback: (dataUrl) => {
+          self.setState({cropModalHref: undefined, cropModalCallback: undefined, [fieldName]: dataUrl});
+        }
+      });
     });
     reader.readAsDataURL(file);
   }
@@ -75,6 +84,7 @@ class Demo extends Component<Props, State> {
         RVCC Demo
       </Header>
       <Segment>
+        <CropBox href={this.state.cropModalHref} onComplete={this.state.cropModalCallback} />
         <Grid>
           <Grid.Row>
             <Grid.Column width={8}>
