@@ -1,5 +1,5 @@
 import {Component, ReactNode} from 'react';
-import {Button, Container, Form, Grid, Header, Icon, Image, Input, Segment, TextArea} from "semantic-ui-react";
+import {Button, Container, Form, Grid, Header, Icon, Image, Input, Segment, Select, TextArea} from "semantic-ui-react";
 import {CanvasRenderer, ImageElement, ReactRenderer, RenderElement, TextElement} from "./renderer";
 import {CropBox} from "./cropbox";
 
@@ -8,6 +8,7 @@ export interface TemplateState {
   program_info?: string
   logo?: string
   pic?: string
+  font?: 'Quicksand' | 'Kalam' | 'Rock Salt'
 }
 
 export interface Props {
@@ -23,6 +24,7 @@ interface State {
   program_info?: string
   logo?: string
   pic?: string
+  font?: 'Quicksand' | 'Kalam' | 'Rock Salt'
 
   cropModalHref?: string
   cropModalCallback?: (dataUrl: string) => void
@@ -48,6 +50,7 @@ export class TemplateForm extends Component<Props, State> {
     this.state = {
       website: "",
       program_info: "",
+      font: 'Quicksand',
     };
     this.setImage = this.setImage.bind(this);
   }
@@ -58,6 +61,7 @@ export class TemplateForm extends Component<Props, State> {
       program_info: "",
       logo: undefined,
       pic: undefined,
+      font: 'Quicksand',
       cropModalHref: undefined,
       cropModalCallback: undefined,
     });
@@ -150,6 +154,15 @@ export class TemplateForm extends Component<Props, State> {
                   <label>Picture</label>
                   <ImageSelectFormField value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
                 </Form.Field>
+                <Form.Field>
+                  <label>Font</label>
+                  <Select options={[
+                    {text: "Quicksand", value: 'Quicksand'},
+                    {text: "Kalam", value: "Kalam"},
+                    {text: "Rock Salt", value: "Rock Salt"},
+                  ]} value={this.state.font} onChange={(e, data) => this.setState({font: data.value as 'Quicksand' | 'Kalam' | 'Rock Salt'})} />
+                </Form.Field>
+
                 <Button type="button" color="black" onClick={() => this.reset()}>Reset</Button>
                 <Button type="button" primary icon labelPosition="left" onClick={() => this.downloadPng()}><Icon name="download" />Download (PNG)</Button>
               </Form>
