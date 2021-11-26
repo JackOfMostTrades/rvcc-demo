@@ -1,14 +1,15 @@
 import {Component, ReactNode} from 'react';
 import {Button, Container, Form, Grid, Header, Icon, Image, Input, Segment, Select, TextArea} from "semantic-ui-react";
-import {CanvasRenderer, ImageElement, PdfRenderer, ReactRenderer, RenderElement, TextElement} from "./renderer";
+import {CanvasRenderer, ImageElement, PdfRenderer, ReactRenderer, RenderElement} from "./renderer";
 import {CropBox} from "./cropbox";
+import {FONTS} from "./fonts";
 
 export interface TemplateState {
   website?: string
   program_info?: string
   logo?: string
   pic?: string
-  font?: 'Quicksand' | 'Kalam' | 'Rock Salt'
+  font?: string
   fontSize?: number
 }
 
@@ -25,7 +26,7 @@ interface State {
   program_info?: string
   logo?: string
   pic?: string
-  font?: 'Quicksand' | 'Kalam' | 'Rock Salt'
+  font?: string
   fontSize?: number
 
   cropModalHref?: string
@@ -179,11 +180,8 @@ export class TemplateForm extends Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <label>Font</label>
-                  <Select options={[
-                    {text: "Quicksand", value: 'Quicksand'},
-                    {text: "Kalam", value: "Kalam"},
-                    {text: "Rock Salt", value: "Rock Salt"},
-                  ]} value={this.state.font} onChange={(e, data) => this.setState({font: data.value as 'Quicksand' | 'Kalam' | 'Rock Salt'})} />
+                  <Select options={FONTS.map(f => {return {key: f, text: f, value: f}})}
+                          value={this.state.font} onChange={(e, data) => this.setState({font: data.value as string})} />
                 </Form.Field>
                 <Form.Field>
                   <label>Font Size</label>

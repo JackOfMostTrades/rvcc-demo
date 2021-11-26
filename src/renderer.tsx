@@ -1,5 +1,6 @@
 import {Component, createRef, Fragment, ReactNode, RefObject, SVGProps} from "react";
 import * as PDFKit from "pdfkit";
+import {fetchFontTtf} from "./fonts";
 
 export interface RenderElement {
     renderToReact(key: any): ReactNode;
@@ -13,7 +14,6 @@ export interface TextElementOptions {
     textAnchor?: 'start' | 'end' | 'middle';
     fontSize?: number;
     color?: string,
-    fontWeight?: 'bold';
     fontFamily?: string;
     verticalAlign?: 'top' | 'middle' | 'bottom';
     bgFill?: string;
@@ -114,18 +114,17 @@ export class TextElement implements RenderElement {
         let nodes: Array<ReactNode> = [];
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
-            nodes.push(<BgSvgTextNode key={key} text={line.line} textProps={{
+            nodes.push(<BgSvgTextNode key={i} text={line.line} textProps={{
                 x: line.x,
                 y: line.y,
                 textAnchor: this.options.textAnchor,
                 fontSize: this.options.fontSize,
                 fill: this.options.color,
-                fontWeight: this.options.fontWeight,
                 fontFamily: this.options.fontFamily,
             }} bgFill={this.options.bgFill} bgPadding={this.options.bgPadding}/>);
         }
 
-        return <Fragment children={nodes} />;
+        return <Fragment key={key} children={nodes} />;
     }
 
     renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void> {
@@ -142,9 +141,6 @@ export class TextElement implements RenderElement {
         }
 
         let font: string = '';
-        if (this.options.fontWeight) {
-            font += this.options.fontWeight + ' ';
-        }
         if (this.options.fontSize) {
             font += this.options.fontSize + 'px ';
         }
@@ -191,55 +187,50 @@ export class TextElement implements RenderElement {
             return Promise.resolve();
         }
 
-        let font: string;
-        if (this.options.fontFamily.indexOf('Quicksand,') === 0) {
-            font = 'Quicksand';
-        } else if (this.options.fontFamily.indexOf('Kalam,') === 0) {
-            font = 'Kalam';
-        } else if (this.options.fontFamily.indexOf('Rock Salt,') === 0) {
-            font = 'Rock Salt';
-        } else {
+        if (this.options.fontFamily.indexOf(',') === -1) {
             return Promise.reject("Unsupported font family: " + this.options.fontFamily);
         }
-        if (this.options.fontWeight === 'bold') {
-            font += '-Bold';
-        }
+        let font = this.options.fontFamily.substring(0, this.options.fontFamily.indexOf(','));
 
-        doc.font(font);
-        if (this.options.fontSize) {
-            doc.fontSize(this.options.fontSize);
-        }
+        return fetchFontTtf(font)
+            .then((fontArrayBuffer) => {
+                doc.registerFont(font, fontArrayBuffer)
+                doc.font(font);
+                if (this.options.fontSize) {
+                    doc.fontSize(this.options.fontSize);
+                }
 
-        let options: PDFKit.Mixins.TextOptions = {
-            lineBreak: false,
-            baseline: 'alphabetic',
-        }
+                let options: PDFKit.Mixins.TextOptions = {
+                    lineBreak: false,
+                    baseline: 'alphabetic',
+                }
 
-        let lines = this.getLinesToRender();
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
-            let width = doc.widthOfString(line.line, options);
+                let lines = this.getLinesToRender();
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    let width = doc.widthOfString(line.line, options);
 
-            let x = line.x
-            if (this.options.textAnchor === 'middle') {
-                x -= width/2;
-            } else if (this.options.textAnchor === 'end') {
-                x -= width;
-            }
+                    let x = line.x
+                    if (this.options.textAnchor === 'middle') {
+                        x -= width/2;
+                    } else if (this.options.textAnchor === 'end') {
+                        x -= width;
+                    }
 
-            if (this.options.bgFill) {
-                let padding = this.options.bgPadding || 0;
-                let height = doc.heightOfString(line.line, options);
-                doc.rect(x, line.y-height-padding, width+2*padding, height+2*padding);
-                doc.fill(this.options.bgFill);
-            }
+                    if (this.options.bgFill) {
+                        let padding = this.options.bgPadding || 0;
+                        let height = doc.heightOfString(line.line, options);
+                        doc.rect(x, line.y-height-padding, width+2*padding, height+2*padding);
+                        doc.fill(this.options.bgFill);
+                    }
 
-            doc.fillColor(this.options.color || 'black');
-            doc.strokeColor(this.options.color || 'black');
-            doc.text(line.line, x, line.y, options);
-        }
+                    doc.fillColor(this.options.color || 'black');
+                    doc.strokeColor(this.options.color || 'black');
+                    doc.text(line.line, x, line.y, options);
+                }
 
-        return Promise.resolve();
+                return Promise.resolve();
+            });
     }
 }
 
@@ -455,12 +446,6 @@ export class PdfRenderer implements Renderer<Promise<PDFKit.PDFDocument>> {
             },
         });
         let chain: Promise<void> = Promise.resolve();
-        for (let fontName in fontMap) {
-            chain = chain.then(() => fetchFont(fontName).then(fontBuffer => {
-                doc.registerFont(fontName, fontBuffer);
-            }));
-        }
-
         for (let i = 0; i < children.length; i++) {
             let child = children[i];
             chain = chain.then(() => child.renderToPdf(doc));
@@ -469,33 +454,4 @@ export class PdfRenderer implements Renderer<Promise<PDFKit.PDFDocument>> {
             return doc;
         });
     }
-}
-
-let fontMap: {[key: string]: string} = {
-    "Quicksand-Bold": "https://fonts.gstatic.com/s/quicksand/v24/6xK-dSZaM9iE8KbpRA_LJ3z8mH9BOJvgkBgv58a-xw.ttf",
-    "Rock Salt-Bold": "https://fonts.gstatic.com/s/rocksalt/v11/MwQ0bhv11fWD6QsAVOZrt0M_.ttf",
-    "Kalam-Bold": "https://fonts.gstatic.com/s/kalam/v11/YA9Qr0Wd4kDdMtDqHTLMkiE.ttf",
-}
-let fontCache: {[key: string]: Promise<ArrayBuffer>} = {};
-function fetchFont(name: string): Promise<ArrayBuffer> {
-    let val = fontCache[name];
-    if (val) {
-        return val;
-    }
-
-    let url = fontMap[name];
-    if (!url) {
-        return Promise.reject(new Error("Unsupported font family: " + name));
-    }
-    let promise = fetch(url)
-        .then(res => {
-            if (res.status !== 200) {
-                throw new Error("Bad response code: " + res.status);
-            }
-            return res.blob();
-        }).then(blob => {
-            return blob.arrayBuffer()
-        });
-    fontCache[name] = promise;
-    return promise;
 }

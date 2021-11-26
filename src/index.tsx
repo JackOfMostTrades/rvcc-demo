@@ -2,6 +2,7 @@ import {render} from "react-dom";
 import {Component, createElement} from "react";
 import {TemplateCollection} from "./template_collection";
 import {Container, Segment, Select} from "semantic-ui-react";
+import {FONTS} from "./fonts";
 
 class Demo extends Component<{}, {template: number}> {
     constructor(props: {}) {
@@ -35,4 +36,19 @@ class Demo extends Component<{}, {template: number}> {
     }
 }
 
+function preloadFonts() {
+    // Trick to force preload of fonts
+    let div = document.createElement('div');
+    div.style.opacity = '0';
+    div.style.height = '0';
+    for (let font of FONTS) {
+        let span = document.createElement('span');
+        span.style.fontFamily = font;
+        span.appendChild(document.createTextNode('x'));
+        div.appendChild(span);
+    }
+    document.body.appendChild(div);
+}
+
+preloadFonts();
 render(createElement(Demo), document.getElementById('demo'));

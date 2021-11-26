@@ -25,8 +25,8 @@ class CommonTemplateForm extends Component<CommonTemplateFormProps, {}> {
             renderChildren={[
                 (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 1235, horizontalAlign: 'middle'}),
                 (state: TemplateState) => new ImageElement(state.logo, {x: 1396, y: 1825, width: 175, height: 175, horizontalAlign: 'right'}),
-                (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: this.props.bgColor, bgPadding: 5}),
-                (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 1902 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
+                (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: this.props.bgColor, bgPadding: 5}),
+                (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 1902 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
             ]} />
     }
 }
@@ -69,8 +69,8 @@ export class TemplateCollection extends Component<Props, State> {
                     renderChildren={[
                         (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 806, horizontalAlign: 'middle'}),
                         (state: TemplateState) => new ImageElement(state.logo, {x: 1396, y: 1396, width: 175, height: 175, horizontalAlign: 'right'}),
-                        (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: '#ffbd59', bgPadding: 5}),
-                        (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 1473 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
+                        (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: '#ffbd59', bgPadding: 5}),
+                        (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 1473 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
                     ]} />
             case 11:
                 return <TemplateForm
@@ -81,8 +81,8 @@ export class TemplateCollection extends Component<Props, State> {
                     renderChildren={[
                         (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 282, horizontalAlign: 'middle'}),
                         (state: TemplateState) => new ImageElement(state.logo, {x: 1396, y: 872, width: 175, height: 175, horizontalAlign: 'right'}),
-                        (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: '#ffbd59', bgPadding: 5}),
-                        (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 949 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
+                        (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: '#ffbd59', bgPadding: 5}),
+                        (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 949 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
                     ]} />
         }
         return null;
