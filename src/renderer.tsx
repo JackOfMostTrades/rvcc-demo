@@ -39,7 +39,9 @@ class BgSvgTextNode extends Component<BgSvgTextNodeProps, {extents?: DOMRect}> {
     }
 
     componentDidUpdate(prevProps: BgSvgTextNodeProps) {
-        if (prevProps.text !== this.props.text || prevProps.textProps.fontFamily !== this.props.textProps.fontFamily) {
+        if (prevProps.text !== this.props.text
+                || prevProps.textProps.fontFamily !== this.props.textProps.fontFamily
+                || prevProps.textProps.fontSize !== this.props.textProps.fontSize) {
             this.updateExtents();
         }
     }

@@ -9,6 +9,7 @@ export interface TemplateState {
   logo?: string
   pic?: string
   font?: 'Quicksand' | 'Kalam' | 'Rock Salt'
+  fontSize?: number
 }
 
 export interface Props {
@@ -25,6 +26,7 @@ interface State {
   logo?: string
   pic?: string
   font?: 'Quicksand' | 'Kalam' | 'Rock Salt'
+  fontSize?: number
 
   cropModalHref?: string
   cropModalCallback?: (dataUrl: string) => void
@@ -51,6 +53,7 @@ export class TemplateForm extends Component<Props, State> {
       website: "",
       program_info: "",
       font: 'Quicksand',
+      fontSize: 55,
     };
     this.setImage = this.setImage.bind(this);
   }
@@ -62,6 +65,7 @@ export class TemplateForm extends Component<Props, State> {
       logo: undefined,
       pic: undefined,
       font: 'Quicksand',
+      fontSize: 55,
       cropModalHref: undefined,
       cropModalCallback: undefined,
     });
@@ -161,6 +165,10 @@ export class TemplateForm extends Component<Props, State> {
                     {text: "Kalam", value: "Kalam"},
                     {text: "Rock Salt", value: "Rock Salt"},
                   ]} value={this.state.font} onChange={(e, data) => this.setState({font: data.value as 'Quicksand' | 'Kalam' | 'Rock Salt'})} />
+                </Form.Field>
+                <Form.Field>
+                  <label>Font Size</label>
+                  <Input type="number" value={this.state.fontSize} onChange={e => this.setState({fontSize: parseInt(e.target.value)})} />
                 </Form.Field>
 
                 <Button type="button" color="black" onClick={() => this.reset()}>Reset</Button>
