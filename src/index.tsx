@@ -25,6 +25,8 @@ class Demo extends Component<{}, {template: number}> {
                     {text: "Resilient", value: 7},
                     {text: "Valid", value: 8},
                     {text: "Worthy", value: 9},
+                    {text: "Boundaries (Square)", value: 10},
+                    {text: "Boundaries (4x6)", value: 11},
                 ]} value={this.state.template} onChange={(e, data) => this.setState({template: data.value as number})} />
             </Segment>
             <TemplateCollection templateIndex={this.state.template} />
