@@ -1,8 +1,10 @@
-import {Component, createRef, ReactNode, Fragment, ReactSVGElement, Ref, RefObject, SVGProps} from "react";
+import {Component, createRef, Fragment, ReactNode, RefObject, SVGProps} from "react";
+import * as PDFKit from "pdfkit";
 
 export interface RenderElement {
     renderToReact(key: any): ReactNode;
     renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void>;
+    renderToPdf(doc: PDFKit.PDFDocument): Promise<void>;
 }
 
 export interface TextElementOptions {
@@ -127,6 +129,10 @@ export class TextElement implements RenderElement {
     }
 
     renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void> {
+        if (!this.text) {
+            return Promise.resolve();
+        }
+
         if (this.options.textAnchor === 'middle') {
             ctx.textAlign = 'center';
         } else if (this.options.textAnchor === 'end') {
@@ -177,6 +183,62 @@ export class TextElement implements RenderElement {
             }
             ctx.fillText(line.line, line.x, line.y);
         }
+        return Promise.resolve();
+    }
+
+    public renderToPdf(doc: PDFKit.PDFDocument): Promise<void> {
+        if (!this.text) {
+            return Promise.resolve();
+        }
+
+        let font: string;
+        if (this.options.fontFamily.indexOf('Quicksand,') === 0) {
+            font = 'Quicksand';
+        } else if (this.options.fontFamily.indexOf('Kalam,') === 0) {
+            font = 'Kalam';
+        } else if (this.options.fontFamily.indexOf('Rock Salt,') === 0) {
+            font = 'Rock Salt';
+        } else {
+            return Promise.reject("Unsupported font family: " + this.options.fontFamily);
+        }
+        if (this.options.fontWeight === 'bold') {
+            font += '-Bold';
+        }
+
+        doc.font(font);
+        if (this.options.fontSize) {
+            doc.fontSize(this.options.fontSize);
+        }
+
+        let options: PDFKit.Mixins.TextOptions = {
+            lineBreak: false,
+            baseline: 'alphabetic',
+        }
+
+        let lines = this.getLinesToRender();
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            let width = doc.widthOfString(line.line, options);
+
+            let x = line.x
+            if (this.options.textAnchor === 'middle') {
+                x -= width/2;
+            } else if (this.options.textAnchor === 'end') {
+                x -= width;
+            }
+
+            if (this.options.bgFill) {
+                let padding = this.options.bgPadding || 0;
+                let height = doc.heightOfString(line.line, options);
+                doc.rect(x, line.y-height-padding, width+2*padding, height+2*padding);
+                doc.fill(this.options.bgFill);
+            }
+
+            doc.fillColor(this.options.color || 'black');
+            doc.strokeColor(this.options.color || 'black');
+            doc.text(line.line, x, line.y, options);
+        }
+
         return Promise.resolve();
     }
 }
@@ -238,7 +300,7 @@ export class ImageElement implements RenderElement {
 
         if (this.options.bgFill) {
             const bgPadding = this.options.bgPadding || 0;
-            return <Fragment>
+            return <Fragment key={key}>
                 <rect x={this.options.x - bgPadding}
                       y={this.options.y - bgPadding}
                       width={this.options.width + 2*bgPadding}
@@ -295,14 +357,56 @@ export class ImageElement implements RenderElement {
                 reject();
             }
         });
-
-        if (this.href === 'bg-thumbnail.jpg') {
-            img.src = 'bg.png';
-        } else {
-            img.src = this.href;
-        }
+        img.src = this.href;
 
         return promise;
+    }
+
+    renderToPdf(doc: PDFKit.PDFDocument): Promise<void> {
+        if (!this.href) {
+            return Promise.resolve();
+        }
+
+        let align: 'center' | 'right' | undefined;
+        if (this.options.horizontalAlign === 'middle') {
+            align = 'center';
+        } else if (this.options.horizontalAlign === 'right') {
+            align = 'right';
+        }
+        let valign: 'center' | 'bottom' | undefined;
+        if (this.options.verticalAlign === 'middle') {
+            valign = 'center';
+        } else if (this.options.verticalAlign === 'bottom') {
+            valign = 'bottom';
+        }
+
+        let dataUrlPromise: Promise<string>;
+        if (this.href.indexOf('data:') === 0) {
+            dataUrlPromise = Promise.resolve(this.href);
+        } else {
+            dataUrlPromise = new Promise((resolve, reject) => {
+                let img = new Image();
+                img.onload = () => {
+                    let canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = (e) => {
+                    reject(e);
+                }
+                img.src = this.href;
+            });
+        }
+
+        return dataUrlPromise.then(dataurl => {
+            doc.image(dataurl, this.options.x, this.options.y, {
+                fit: [this.options.width, this.options.height],
+                align: align,
+                valign: valign,
+            });
+        });
     }
 }
 
@@ -328,7 +432,7 @@ export class CanvasRenderer implements Renderer<Promise<HTMLCanvasElement>> {
 
         let chain: Promise<void> = Promise.resolve();
         let ctx = canvas.getContext('2d');
-        ctx.textBaseline = 'bottom';
+        ctx.textBaseline = 'alphabetic';
         for (let i = 0; i < children.length; i++) {
             let child = children[i];
             chain = chain.then(() => child.renderToCanvas(ctx));
@@ -337,4 +441,61 @@ export class CanvasRenderer implements Renderer<Promise<HTMLCanvasElement>> {
             return canvas;
         });
     }
+}
+
+export class PdfRenderer implements Renderer<Promise<PDFKit.PDFDocument>> {
+    render(width: number, height: number, children: Array<RenderElement>): Promise<PDFKit.PDFDocument> {
+        const doc: PDFKit.PDFDocument = new PDFDocument({
+            size: [width, height],
+            margins: {
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+            },
+        });
+        let chain: Promise<void> = Promise.resolve();
+        for (let fontName in fontMap) {
+            chain = chain.then(() => fetchFont(fontName).then(fontBuffer => {
+                doc.registerFont(fontName, fontBuffer);
+            }));
+        }
+
+        for (let i = 0; i < children.length; i++) {
+            let child = children[i];
+            chain = chain.then(() => child.renderToPdf(doc));
+        }
+        return chain.then(() => {
+            return doc;
+        });
+    }
+}
+
+let fontMap: {[key: string]: string} = {
+    "Quicksand-Bold": "https://fonts.gstatic.com/s/quicksand/v24/6xK-dSZaM9iE8KbpRA_LJ3z8mH9BOJvgkBgv58a-xw.ttf",
+    "Rock Salt-Bold": "https://fonts.gstatic.com/s/rocksalt/v11/MwQ0bhv11fWD6QsAVOZrt0M_.ttf",
+    "Kalam-Bold": "https://fonts.gstatic.com/s/kalam/v11/YA9Qr0Wd4kDdMtDqHTLMkiE.ttf",
+}
+let fontCache: {[key: string]: Promise<ArrayBuffer>} = {};
+function fetchFont(name: string): Promise<ArrayBuffer> {
+    let val = fontCache[name];
+    if (val) {
+        return val;
+    }
+
+    let url = fontMap[name];
+    if (!url) {
+        return Promise.reject(new Error("Unsupported font family: " + name));
+    }
+    let promise = fetch(url)
+        .then(res => {
+            if (res.status !== 200) {
+                throw new Error("Bad response code: " + res.status);
+            }
+            return res.blob();
+        }).then(blob => {
+            return blob.arrayBuffer()
+        });
+    fontCache[name] = promise;
+    return promise;
 }

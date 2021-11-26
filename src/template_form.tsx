@@ -1,6 +1,6 @@
 import {Component, ReactNode} from 'react';
 import {Button, Container, Form, Grid, Header, Icon, Image, Input, Segment, Select, TextArea} from "semantic-ui-react";
-import {CanvasRenderer, ImageElement, ReactRenderer, RenderElement, TextElement} from "./renderer";
+import {CanvasRenderer, ImageElement, PdfRenderer, ReactRenderer, RenderElement, TextElement} from "./renderer";
 import {CropBox} from "./cropbox";
 
 export interface TemplateState {
@@ -109,6 +109,25 @@ export class TemplateForm extends Component<Props, State> {
     });
   }
 
+  private downloadPdf() {
+    let docPromise = new PdfRenderer().render(this.props.width, this.props.height, this.getRenderChildren(false));
+    docPromise.then(doc => {
+      const stream = doc.pipe(blobStream());
+      stream.on('finish', () => {
+        let image = stream.toBlobURL("application/pdf");
+        let link = document.createElement("a");
+        link.download = 'foo.pdf';
+        link.href = image;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+      doc.end();
+    }).catch(err => {
+      alert(err);
+    });
+  }
+
   private getRenderChildren(forPreview: boolean): Array<RenderElement> {
     let children: Array<RenderElement> = [
         new ImageElement(forPreview ? this.props.backgroundThumbnail : this.props.backgroundFull,
@@ -173,6 +192,7 @@ export class TemplateForm extends Component<Props, State> {
 
                 <Button type="button" color="black" onClick={() => this.reset()}>Reset</Button>
                 <Button type="button" primary icon labelPosition="left" onClick={() => this.downloadPng()}><Icon name="download" />Download (PNG)</Button>
+                <Button type="button" color="green" icon labelPosition="left" onClick={() => this.downloadPdf()}><Icon name="file pdf" />Download (PDF)</Button>
               </Form>
             </Grid.Column>
             <Grid.Column width={8}>
