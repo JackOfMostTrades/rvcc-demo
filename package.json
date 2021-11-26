@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "curl -L -O https://github.com/devongovett/blob-stream/releases/download/v0.1.3/blob-stream.js && webpack"
+    "build": "([ -e blob-stream.js ] || curl -L -O https://github.com/devongovett/blob-stream/releases/download/v0.1.3/blob-stream.js) && webpack"
   },
   "keywords": [],
   "author": "",

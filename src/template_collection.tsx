@@ -23,7 +23,7 @@ class CommonTemplateForm extends Component<CommonTemplateFormProps, {}> {
             backgroundThumbnail={this.props.thumbnail}
             backgroundFull={this.props.bg}
             renderChildren={[
-                (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 1235}),
+                (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 1235, horizontalAlign: 'middle'}),
                 (state: TemplateState) => new ImageElement(state.logo, {x: 1396, y: 1825, width: 175, height: 175, horizontalAlign: 'right'}),
                 (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: this.props.bgColor, bgPadding: 5}),
                 (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 1902 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
@@ -67,7 +67,7 @@ export class TemplateCollection extends Component<Props, State> {
                     backgroundThumbnail="images/boundaries_square.png"
                     backgroundFull="images/boundaries_square.png"
                     renderChildren={[
-                        (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 806}),
+                        (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 806, horizontalAlign: 'middle'}),
                         (state: TemplateState) => new ImageElement(state.logo, {x: 1396, y: 1396, width: 175, height: 175, horizontalAlign: 'right'}),
                         (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: '#ffbd59', bgPadding: 5}),
                         (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 1473 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
@@ -79,7 +79,7 @@ export class TemplateCollection extends Component<Props, State> {
                     backgroundThumbnail="images/boundaries_4x6.png"
                     backgroundFull="images/boundaries_4x6.png"
                     renderChildren={[
-                        (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 282}),
+                        (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 282, horizontalAlign: 'middle'}),
                         (state: TemplateState) => new ImageElement(state.logo, {x: 1396, y: 872, width: 175, height: 175, horizontalAlign: 'right'}),
                         (state: TemplateState) => new TextElement(state.website, {x: 1571, y: state.fontSize || 55, textAnchor: 'end', fontSize: state.fontSize || 55, fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', bgFill: '#ffbd59', bgPadding: 5}),
                         (state: TemplateState) => new TextElement(state.program_info, {x: (state.logo ? 698 : 785), y: 949 + (state.fontSize || 55)/2, textAnchor: 'middle', fontSize: state.fontSize || 55, color: 'black', fontWeight: 'bold', fontFamily: (state.font || 'Quicksand') + ', sans-serif', verticalAlign: 'middle'})
