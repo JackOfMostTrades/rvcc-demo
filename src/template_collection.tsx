@@ -23,10 +23,10 @@ class CommonTemplateForm extends Component<CommonTemplateFormProps, {}> {
             backgroundThumbnail={this.props.thumbnail}
             backgroundFull={this.props.bg}
             renderChildren={[
-                (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 318, width: 1571, height: 1435}),
-                (state: TemplateState) => new ImageElement(state.logo, {x: 1271, y: 1453, width: 300, height: 300, bgFill: this.props.bgColor}),
+                (state: TemplateState) => new ImageElement(state.pic, {x: 0, y: 590, width: 1571, height: 1235}),
+                (state: TemplateState) => new ImageElement(state.logo, {x: 1396, y: 1825, width: 175, height: 175, horizontalAlign: 'right'}),
                 (state: TemplateState) => new TextElement(state.website, {x: 1571, y: 55, textAnchor: 'end', fontSize: 55, fontWeight: 'bold', fontFamily: 'Quicksand, sans-serif', bgFill: this.props.bgColor, bgPadding: 5}),
-                (state: TemplateState) => new TextElement(state.program_info, {x: 785, y: 1950, textAnchor: 'middle', fontSize: 60, color: 'white', fontWeight: 'bold', fontFamily: 'Quicksand, sans-serif', verticalAlign: 'middle'})
+                (state: TemplateState) => new TextElement(state.program_info, {x: 698, y: 1933, textAnchor: 'middle', fontSize: 60, color: 'black', fontWeight: 'bold', fontFamily: 'Quicksand, sans-serif', verticalAlign: 'middle'})
             ]} />
     }
 }
@@ -39,12 +39,28 @@ export class TemplateCollection extends Component<Props, State> {
     }
 
     render() {
-        let template: ReactNode;
-        if (this.props.templateIndex === 0) {
-            template = <CommonTemplateForm thumbnail='bg-thumbnail.jpg' bg='bg.png' bgColor='#ffbd59'/>
-        } else if (this.props.templateIndex === 1) {
-            template = <CommonTemplateForm thumbnail='bg2-thumbnail.jpg' bg='bg2.png' bgColor='#ccb4ae'/>
+        switch (this.props.templateIndex) {
+            case 0:
+                return <CommonTemplateForm thumbnail='images/boundaries.png' bg='images/boundaries.png' bgColor='#ffbd59'/>
+            case 1:
+                return <CommonTemplateForm thumbnail='images/deserve.png' bg='images/deserve.png' bgColor='#f36e80'/>
+            case 2:
+                return <CommonTemplateForm thumbnail='images/difference.png' bg='images/difference.png' bgColor='#4ea23e'/>
+            case 3:
+                return <CommonTemplateForm thumbnail='images/experience.png' bg='images/experience.png' bgColor='#9d7bd9'/>
+            case 4:
+                return <CommonTemplateForm thumbnail='images/gentle.png' bg='images/gentle.png' bgColor='#ccb4ae'/>
+            case 5:
+                return <CommonTemplateForm thumbnail='images/pace.png' bg='images/pace.png' bgColor='#64cca3'/>
+            case 6:
+                return <CommonTemplateForm thumbnail='images/progress.png' bg='images/progress.png' bgColor='#f7e367'/>
+            case 7:
+                return <CommonTemplateForm thumbnail='images/resilient.png' bg='images/resilient.png' bgColor='#b1a1fa'/>
+            case 8:
+                return <CommonTemplateForm thumbnail='images/valid.png' bg='images/valid.png' bgColor='#7acbef'/>
+            case 9:
+                return <CommonTemplateForm thumbnail='images/worthy.png' bg='images/worthy.png' bgColor='#f09333'/>
         }
-        return template;
+        return null;
     }
 }
