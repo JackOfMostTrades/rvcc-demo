@@ -184,6 +184,8 @@ export interface ImageElementOptions {
     y: number;
     width: number;
     height: number;
+    horizontalAlign?: 'middle' | 'left' | 'right';
+    verticalAlign?: 'middle' | 'top' | 'bottom';
 
     bgFill?: string
     bgPadding?: number;
@@ -203,13 +205,33 @@ export class ImageElement implements RenderElement {
             return null;
         }
 
+        let alignment = '';
+        let horizontalAlignment = this.options.horizontalAlign || 'middle';
+        if (horizontalAlignment === 'left') {
+            alignment = 'xMin';
+        } else if (horizontalAlignment === 'right') {
+            alignment = 'xMax';
+        } else {
+            alignment = 'xMid';
+        }
+        let verticalAlignment = this.options.verticalAlign || 'middle';
+        if (verticalAlignment === 'top') {
+            alignment += 'YMin';
+        } else if (verticalAlignment === 'bottom') {
+            alignment += 'YMax';
+        } else {
+            alignment += 'YMid';
+        }
+        alignment += ' meet';
+
         let img = <image
             key={key}
             href={this.href}
             x={this.options.x}
             y={this.options.y}
             width={this.options.width}
-            height={this.options.height}>
+            height={this.options.height}
+            preserveAspectRatio={alignment}>
         </image>;
 
         if (this.options.bgFill) {
@@ -244,8 +266,25 @@ export class ImageElement implements RenderElement {
                 let scale = Math.min(this.options.width / img.naturalWidth, this.options.height / img.naturalHeight);
                 let width = scale * img.naturalWidth;
                 let height = scale * img.naturalHeight;
-                let x = this.options.x + (this.options.width - width)/2;
-                let y = this.options.y + (this.options.height - height)/2;
+
+                let x: number, y: number;
+                let horizontalAlignment = this.options.horizontalAlign || 'middle';
+                if (horizontalAlignment === 'left') {
+                    x = this.options.x;
+                } else if (horizontalAlignment === 'right') {
+                    x = this.options.x + this.options.width - width;
+                } else {
+                    x = this.options.x + (this.options.width - width)/2;
+                }
+
+                let verticalAlignment = this.options.verticalAlign || 'middle';
+                if (verticalAlignment === 'top') {
+                    y = this.options.y;
+                } else if (verticalAlignment === 'bottom') {
+                    y = this.options.y + this.options.height - height;
+                } else {
+                    y = this.options.y + (this.options.height - height)/2;
+                }
 
                 ctx.drawImage(img, x, y, width, height);
                 resolve();
