@@ -1,5 +1,18 @@
 import {Component, ReactNode} from 'react';
-import {Button, Container, Form, Grid, Header, Icon, Image, Input, Segment, Select, TextArea} from "semantic-ui-react";
+import {
+  Button,
+  Checkbox,
+  Container,
+  Form,
+  Grid,
+  Header,
+  Icon,
+  Image,
+  Input,
+  Segment,
+  Select,
+  TextArea
+} from "semantic-ui-react";
 import {CanvasRenderer, ImageElement, PdfRenderer, ReactRenderer, RenderElement, TextElement} from "./renderer";
 import {CropBox} from "./cropbox";
 import {FONTS} from "./fonts";
@@ -15,6 +28,7 @@ interface State {
   website?: string
   program_info?: string
   logo?: string
+  use_default_pic?: boolean
   pic?: string
   font?: string
   fontSize?: number
@@ -23,7 +37,7 @@ interface State {
   cropModalCallback?: (dataUrl: string) => void
 }
 
-class ImageSelectFormField extends Component<{value?: string, clear: () => void, setImage: (files: FileList) => void}, {}> {
+class ImageSelectFormField extends Component<{value?: string, disabled?: boolean, clear: () => void, setImage: (files: FileList) => void}, {}> {
   render() {
     if (this.props.value) {
       return <Segment clearing>
@@ -33,7 +47,7 @@ class ImageSelectFormField extends Component<{value?: string, clear: () => void,
         </Button>
       </Segment>;
     }
-    return <Input type="file" onChange={e => this.props.setImage(e.target.files)} />;
+    return <Input disabled={this.props.disabled} type="file" onChange={e => this.props.setImage(e.target.files)} />;
   }
 }
 
@@ -45,6 +59,7 @@ export class TemplateForm extends Component<Props, State> {
       size: 0,
       website: "",
       program_info: "",
+      use_default_pic: true,
       font: 'Quicksand',
       fontSize: 55,
     };
@@ -59,6 +74,7 @@ export class TemplateForm extends Component<Props, State> {
       program_info: "",
       logo: undefined,
       pic: undefined,
+      use_default_pic: true,
       font: 'Quicksand',
       fontSize: 55,
       cropModalHref: undefined,
@@ -170,6 +186,12 @@ export class TemplateForm extends Component<Props, State> {
         new ImageElement(`${campaign.assetPath}/${background.name.toLowerCase()}_${size.name.toLowerCase()}.png`,
             {x: 0, y: 0, width: size.width, height: size.height}),
     ];
+    if (size.subheader && !this.state.use_default_pic) {
+      children.push(this.toImageElement(size.subheader, `${campaign.assetPath}/${background.name.toLowerCase()}_subheader.png`));
+    }
+    if (this.state.use_default_pic) {
+      children.push(this.toImageElement(size.picture, `${campaign.assetPath}/${background.name.toLowerCase()}_defaultpicture.png`));
+    }
     if (size.picture && this.state.pic) {
       children.push(this.toImageElement(size.picture, this.state.pic));
     }
@@ -231,10 +253,22 @@ export class TemplateForm extends Component<Props, State> {
                   <label>Logo</label>
                   <ImageSelectFormField value={this.state.logo} clear={() => this.setState({logo: undefined})} setImage={(files) => this.setImage('logo', files)} />
                 </Form.Field>
-                <Form.Field>
+
+                <Form.Group inline>
                   <label>Picture</label>
-                  <ImageSelectFormField value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
+                  <Form.Field>
+                    <Checkbox toggle label="Use default picture" checked={this.state.use_default_pic} onChange={(e, data) => {
+                      this.setState({
+                        use_default_pic: data.checked,
+                        pic: data.checked ? undefined : this.state.pic,
+                      });
+                    }} />
+                  </Form.Field>
+                </Form.Group>
+                <Form.Field>
+                  <ImageSelectFormField disabled={this.state.use_default_pic} value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
                 </Form.Field>
+
                 <Form.Field>
                   <label>Font</label>
                   <Select options={FONTS.map(f => {return {key: f, label: <label style={{fontFamily: f}}>{f}</label>, value: f}})}

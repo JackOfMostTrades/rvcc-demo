@@ -4,6 +4,7 @@ export interface SizeSpec {
     width: number
     height: number
 
+    subheader?: ImageSpec
     picture?: ImageSpec
     logo?: ImageSpec
     website?: TextSpec
@@ -69,6 +70,14 @@ export const DEMO_CAMPAIGN: Campaign = {
             name: "11x14",
             width: 1571,
             height: 2000,
+            subheader: {
+                x: 0,
+                y: 355,
+                width: 1571,
+                height: 1645,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'top',
+            },
             picture: {
                 x: 0,
                 y: 590,
@@ -102,6 +111,14 @@ export const DEMO_CAMPAIGN: Campaign = {
             name: "Square",
             width: 1571,
             height: 1571,
+            subheader: {
+                x: 0,
+                y: 355,
+                width: 1571,
+                height: 1216,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'top',
+            },
             picture: {
                 x: 0,
                 y: 590,
@@ -135,6 +152,14 @@ export const DEMO_CAMPAIGN: Campaign = {
             name: "4x6",
             width: 1571,
             height: 1047,
+            subheader: {
+                x: 0,
+                y: 355,
+                width: 1571,
+                height: 692,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'top',
+            },
             picture: {
                 x: 0,
                 y: 590,
