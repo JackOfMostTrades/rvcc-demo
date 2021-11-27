@@ -3,7 +3,7 @@ import {Component, createElement} from "react";
 import {Container, Header} from "semantic-ui-react";
 import {FONTS} from "./fonts";
 import {TemplateForm} from "./template_form";
-import {DEMO_CAMPAIGN} from "./model";
+import {DEMO_CAMPAIGN} from "./demo";
 
 class Demo extends Component<{}, {template: number}> {
     constructor(props: {}) {
