@@ -11,11 +11,12 @@ export interface RenderElement {
 export interface TextElementOptions {
     x: number;
     y: number;
-    textAnchor?: 'start' | 'end' | 'middle';
     fontSize?: number;
     color?: string,
     fontFamily?: string;
-    verticalAlign?: 'top' | 'middle' | 'bottom';
+    horizontalAlign?: 'left' | 'right' | 'center';
+    verticalAlign?: 'top' | 'bottom' | 'center';
+    lineDistribution?: 'down' | 'up' | 'center';
     bgFill?: string;
     bgPadding?: number;
 }
@@ -88,9 +89,16 @@ export class TextElement implements RenderElement {
         let height = this.options.fontSize || 0;
         let lineHeight = height * 1.0;
         let firstY = this.options.y;
-        if (this.options.verticalAlign === 'middle') {
+        if (this.options.verticalAlign === 'top') {
+            // "top" means the 'y' coordinate should be the top of the line.
+            firstY += lineHeight;
+        } else if (this.options.verticalAlign === 'center') {
+            firstY += lineHeight/2;
+        }
+
+        if (this.options.lineDistribution === 'center') {
             firstY -= lineHeight * (lines.length-1) / 2;
-        } else if (this.options.verticalAlign === 'bottom') {
+        } else if (this.options.lineDistribution === 'up') {
             firstY -= lineHeight * (lines.length-1);
         }
         let x = this.options.x;
@@ -110,6 +118,13 @@ export class TextElement implements RenderElement {
             return null;
         }
 
+        let textAnchor = 'start';
+        if (this.options.horizontalAlign === 'right') {
+            textAnchor = 'end';
+        } else if (this.options.horizontalAlign === 'center') {
+            textAnchor = 'middle';
+        }
+
         let lines = this.getLinesToRender();
         let nodes: Array<ReactNode> = [];
         for (let i = 0; i < lines.length; i++) {
@@ -117,7 +132,7 @@ export class TextElement implements RenderElement {
             nodes.push(<BgSvgTextNode key={i} text={line.line} textProps={{
                 x: line.x,
                 y: line.y,
-                textAnchor: this.options.textAnchor,
+                textAnchor: textAnchor,
                 fontSize: this.options.fontSize,
                 fill: this.options.color,
                 fontFamily: this.options.fontFamily,
@@ -132,13 +147,7 @@ export class TextElement implements RenderElement {
             return Promise.resolve();
         }
 
-        if (this.options.textAnchor === 'middle') {
-            ctx.textAlign = 'center';
-        } else if (this.options.textAnchor === 'end') {
-            ctx.textAlign = 'right';
-        } else {
-            ctx.textAlign = 'left';
-        }
+        ctx.textAlign = this.options.horizontalAlign || 'left';
 
         let font: string = '';
         if (this.options.fontSize) {
@@ -160,9 +169,9 @@ export class TextElement implements RenderElement {
                 let fillHeight = this.options.fontSize || 0;
                 let metrics = ctx.measureText(line.line);
                 let width = metrics.width;
-                if (this.options.textAnchor === 'middle') {
+                if (this.options.horizontalAlign === 'center') {
                     fillX -= width/2;
-                } else if (this.options.textAnchor === 'end') {
+                } else if (this.options.horizontalAlign === 'right') {
                     fillX -= width;
                 }
 
@@ -211,9 +220,9 @@ export class TextElement implements RenderElement {
                     let width = doc.widthOfString(line.line, options);
 
                     let x = line.x
-                    if (this.options.textAnchor === 'middle') {
+                    if (this.options.horizontalAlign === 'center') {
                         x -= width/2;
-                    } else if (this.options.textAnchor === 'end') {
+                    } else if (this.options.horizontalAlign === 'right') {
                         x -= width;
                     }
 
@@ -239,8 +248,8 @@ export interface ImageElementOptions {
     y: number;
     width: number;
     height: number;
-    horizontalAlign?: 'middle' | 'left' | 'right';
-    verticalAlign?: 'middle' | 'top' | 'bottom';
+    horizontalAlign?: 'center' | 'left' | 'right';
+    verticalAlign?: 'center' | 'top' | 'bottom';
 
     bgFill?: string
     bgPadding?: number;
@@ -261,7 +270,7 @@ export class ImageElement implements RenderElement {
         }
 
         let alignment = '';
-        let horizontalAlignment = this.options.horizontalAlign || 'middle';
+        let horizontalAlignment = this.options.horizontalAlign || 'center';
         if (horizontalAlignment === 'left') {
             alignment = 'xMin';
         } else if (horizontalAlignment === 'right') {
@@ -269,7 +278,7 @@ export class ImageElement implements RenderElement {
         } else {
             alignment = 'xMid';
         }
-        let verticalAlignment = this.options.verticalAlign || 'middle';
+        let verticalAlignment = this.options.verticalAlign || 'center';
         if (verticalAlignment === 'top') {
             alignment += 'YMin';
         } else if (verticalAlignment === 'bottom') {
@@ -323,7 +332,7 @@ export class ImageElement implements RenderElement {
                 let height = scale * img.naturalHeight;
 
                 let x: number, y: number;
-                let horizontalAlignment = this.options.horizontalAlign || 'middle';
+                let horizontalAlignment = this.options.horizontalAlign || 'center';
                 if (horizontalAlignment === 'left') {
                     x = this.options.x;
                 } else if (horizontalAlignment === 'right') {
@@ -332,7 +341,7 @@ export class ImageElement implements RenderElement {
                     x = this.options.x + (this.options.width - width)/2;
                 }
 
-                let verticalAlignment = this.options.verticalAlign || 'middle';
+                let verticalAlignment = this.options.verticalAlign || 'center';
                 if (verticalAlignment === 'top') {
                     y = this.options.y;
                 } else if (verticalAlignment === 'bottom') {
@@ -359,13 +368,13 @@ export class ImageElement implements RenderElement {
         }
 
         let align: 'center' | 'right' | undefined;
-        if (this.options.horizontalAlign === 'middle') {
+        if (this.options.horizontalAlign === 'center') {
             align = 'center';
         } else if (this.options.horizontalAlign === 'right') {
             align = 'right';
         }
         let valign: 'center' | 'bottom' | undefined;
-        if (this.options.verticalAlign === 'middle') {
+        if (this.options.verticalAlign === 'center') {
             valign = 'center';
         } else if (this.options.verticalAlign === 'bottom') {
             valign = 'bottom';

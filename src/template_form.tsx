@@ -1,27 +1,17 @@
 import {Component, ReactNode} from 'react';
 import {Button, Container, Form, Grid, Header, Icon, Image, Input, Segment, Select, TextArea} from "semantic-ui-react";
-import {CanvasRenderer, ImageElement, PdfRenderer, ReactRenderer, RenderElement} from "./renderer";
+import {CanvasRenderer, ImageElement, PdfRenderer, ReactRenderer, RenderElement, TextElement} from "./renderer";
 import {CropBox} from "./cropbox";
 import {FONTS} from "./fonts";
-
-export interface TemplateState {
-  website?: string
-  program_info?: string
-  logo?: string
-  pic?: string
-  font?: string
-  fontSize?: number
-}
+import {Campaign, ImageSpec, TextSpec} from "./model";
 
 export interface Props {
-  width: number
-  height: number
-  backgroundThumbnail: string
-  backgroundFull: string
-  renderChildren: Array<(state: TemplateState) => RenderElement>
+  campaign: Campaign
 }
 
 interface State {
+  background?: number
+  size?: number
   website?: string
   program_info?: string
   logo?: string
@@ -51,6 +41,8 @@ export class TemplateForm extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      background: 0,
+      size: 0,
       website: "",
       program_info: "",
       font: 'Quicksand',
@@ -61,6 +53,8 @@ export class TemplateForm extends Component<Props, State> {
 
   private reset() {
     this.setState({
+      background: 0,
+      size: 0,
       website: "",
       program_info: "",
       logo: undefined,
@@ -96,7 +90,8 @@ export class TemplateForm extends Component<Props, State> {
   }
 
   private downloadPng() {
-    let canvasPromise = new CanvasRenderer().render(this.props.width, this.props.height, this.getRenderChildren(false));
+    let size = this.props.campaign.sizes[this.state.size];
+    let canvasPromise = new CanvasRenderer().render(size.width, size.height, this.getRenderChildren());
     canvasPromise.then(canvas => {
       let image = canvas.toDataURL("image/png");
       let link = document.createElement("a");
@@ -111,7 +106,8 @@ export class TemplateForm extends Component<Props, State> {
   }
 
   private downloadPdf() {
-    let docPromise = new PdfRenderer().render(this.props.width, this.props.height, this.getRenderChildren(false));
+    let size = this.props.campaign.sizes[this.state.size];
+    let docPromise = new PdfRenderer().render(size.width, size.height, this.getRenderChildren());
     docPromise.then(doc => {
       const stream = doc.pipe(blobStream());
       stream.on('finish', () => {
@@ -129,32 +125,93 @@ export class TemplateForm extends Component<Props, State> {
     });
   }
 
-  private getRenderChildren(forPreview: boolean): Array<RenderElement> {
+
+  private toImageElement(spec: ImageSpec|undefined, href: string|undefined): ImageElement|undefined {
+    if (!spec || !href) {
+      return undefined;
+    }
+    let background = this.props.campaign.backgrounds[this.state.background];
+    return new ImageElement(href, {
+      x: spec.x,
+      y: spec.y,
+      width: spec.width,
+      height: spec.height,
+      horizontalAlign: spec.horizontalAlignment,
+      verticalAlign: spec.verticalAlignment,
+      bgFill: spec.includeBackgroundFill ? background.color : undefined,
+      bgPadding: 0,
+    });
+  }
+
+  private toTextElement(spec: TextSpec|undefined, text: string|undefined): TextElement|undefined {
+    if (!spec || !text) {
+      return undefined;
+    }
+    let background = this.props.campaign.backgrounds[this.state.background];
+    return new TextElement(text, {
+      x: spec.x,
+      y: spec.y,
+      fontSize: this.state.fontSize,
+      color: 'black',
+      fontFamily: this.state.font + ', sans-serif',
+      horizontalAlign: spec.horizontalAlignment,
+      verticalAlign: spec.verticalAlignment,
+      lineDistribution: spec.lineDistribution,
+      bgFill: spec.includeBackgroundFill ? background.color : undefined,
+      bgPadding: 5,
+    });
+  }
+
+  private getRenderChildren(): Array<RenderElement> {
+    let campaign = this.props.campaign;
+    let background = campaign.backgrounds[this.state.background];
+    let size = campaign.sizes[this.state.size];
     let children: Array<RenderElement> = [
-        new ImageElement(forPreview ? this.props.backgroundThumbnail : this.props.backgroundFull,
-            {x: 0, y: 0, width: this.props.width, height: this.props.height}),
+        new ImageElement(`${campaign.assetPath}/${background.name.toLowerCase()}_${size.name.toLowerCase()}.png`,
+            {x: 0, y: 0, width: size.width, height: size.height}),
     ];
-    for (let i = 0; i < this.props.renderChildren.length; i++) {
-      children.push(this.props.renderChildren[i](this.state));
+    if (size.picture && this.state.pic) {
+      children.push(this.toImageElement(size.picture, this.state.pic));
+    }
+    if (size.logo && this.state.logo) {
+      children.push(this.toImageElement(size.logo, this.state.logo));
+    }
+    if (size.website && this.state.website) {
+      children.push(this.toTextElement(size.website, this.state.website));
+    }
+    if (size.programInfo && this.state.program_info) {
+      children.push(this.toTextElement(size.programInfo, this.state.program_info));
     }
     return children;
   }
 
   private renderToDom(): ReactNode {
-    return new ReactRenderer().render(this.props.width, this.props.height, this.getRenderChildren(true));
+    let size = this.props.campaign.sizes[this.state.size];
+    return new ReactRenderer().render(size.width, size.height, this.getRenderChildren());
   }
 
   render() {
     return <Container>
-      <Header as="h1">
-        RVCC Demo
-      </Header>
       <Segment>
         <CropBox href={this.state.cropModalHref} onComplete={this.state.cropModalCallback} />
         <Grid>
           <Grid.Row>
             <Grid.Column width={8}>
               <Form>
+                <Form.Group widths="equal">
+                  <Form.Field>
+                    <label>Background</label>
+                    <Select options={this.props.campaign.backgrounds.map((bg, idx) => {return {value: idx, text: bg.name}})}
+                            value={this.state.background}
+                            onChange={(e, data) => this.setState({background: data.value as number})} />
+                  </Form.Field>
+                  <Form.Field>
+                    <label>Size</label>
+                    <Select options={this.props.campaign.sizes.map((size, idx) => {return {value: idx, text: size.name}})}
+                            value={this.state.size}
+                            onChange={(e, data) => this.setState({size: data.value as number})} />
+                  </Form.Field>
+                </Form.Group>
                 <Form.Field>
                   <label>Website / Social Media</label>
                   <Input value={this.state.website} onChange={e => this.setState({website: e.target.value})} />
