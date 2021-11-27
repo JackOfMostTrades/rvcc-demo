@@ -180,8 +180,9 @@ export class TemplateForm extends Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <label>Font</label>
-                  <Select options={FONTS.map(f => {return {key: f, text: f, value: f}})}
-                          value={this.state.font} onChange={(e, data) => this.setState({font: data.value as string})} />
+                  <Select options={FONTS.map(f => {return {key: f, label: <label style={{fontFamily: f}}>{f}</label>, value: f}})}
+                          value={this.state.font} text={this.state.font}
+                          onChange={(e, data) => this.setState({font: data.value as string})} />
                 </Form.Field>
                 <Form.Field>
                   <label>Font Size</label>
