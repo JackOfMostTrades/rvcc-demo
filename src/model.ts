@@ -1,13 +1,25 @@
+import {Image} from "semantic-ui-react";
 
 export interface SizeSpec {
     name: string
     width: number
     height: number
 
-    subheader?: ImageSpec
+    // The header is always displayed, but the image source can vary based on language
+    header?: ImageSpec
+    // A default picture that will be displayed. The image source depends on background and language. It can be turned off in the form
+    defaultPicture?: ImageSpec
+    // A non-editable picture that gets displayed when defaultPicture is disabled in the form. This is used to include a subheader
+    // containing text that is in the default picture. Image source can vary depending on language
+    antiDefaultPicture?: ImageSpec
+
+    // The user-uploaded picture that can be chosen if defaultPicture gets disabled.
     picture?: ImageSpec
+    // The user-uploaded logo
     logo?: ImageSpec
+    // User-specified website/social media text
     website?: TextSpec
+    // User-specified program information text
     programInfo?: TextSpec
 }
 
@@ -49,4 +61,5 @@ export interface Campaign {
     assetPath: string
     backgrounds: BackgroundSpec[]
     sizes: SizeSpec[]
+    languages: string[]
 }

@@ -2,6 +2,7 @@ import {Campaign} from "./model";
 
 export const DEMO_CAMPAIGN: Campaign = {
     assetPath: "images",
+    languages: ["English", "Spanish"],
     backgrounds: [
         {name: "Boundaries", color: "#ffbd59"},
         {name: "Deserve", color: "#f36e80"},
@@ -19,7 +20,22 @@ export const DEMO_CAMPAIGN: Campaign = {
             name: "11x14",
             width: 1571,
             height: 2000,
-            subheader: {
+            header: {
+                x: 0,
+                y: 214,
+                width: 1571,
+                height: 1786,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'top',
+            },
+            defaultPicture: {
+                x: 0,
+                y: 380,
+                width: 1571,
+                height: 1445,
+                horizontalAlignment: 'center',
+            },
+            antiDefaultPicture: {
                 x: 0,
                 y: 355,
                 width: 1571,
@@ -60,7 +76,22 @@ export const DEMO_CAMPAIGN: Campaign = {
             name: "Square",
             width: 1571,
             height: 1571,
-            subheader: {
+            header: {
+                x: 0,
+                y: 214,
+                width: 1571,
+                height: 1357,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'top',
+            },
+            defaultPicture: {
+                x: 0,
+                y: 380,
+                width: 1571,
+                height: 1016,
+                horizontalAlignment: 'center',
+            },
+            antiDefaultPicture: {
                 x: 0,
                 y: 355,
                 width: 1571,

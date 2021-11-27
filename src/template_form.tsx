@@ -25,6 +25,7 @@ export interface Props {
 interface State {
   background?: number
   size?: number
+  language?: number
   website?: string
   program_info?: string
   logo?: string
@@ -57,6 +58,7 @@ export class TemplateForm extends Component<Props, State> {
     this.state = {
       background: 0,
       size: 0,
+      language: 0,
       website: "",
       program_info: "",
       use_default_pic: true,
@@ -70,6 +72,7 @@ export class TemplateForm extends Component<Props, State> {
     this.setState({
       background: 0,
       size: 0,
+      language: 0,
       website: "",
       program_info: "",
       logo: undefined,
@@ -180,17 +183,21 @@ export class TemplateForm extends Component<Props, State> {
 
   private getRenderChildren(): Array<RenderElement> {
     let campaign = this.props.campaign;
+    let language = campaign.languages[this.state.language];
     let background = campaign.backgrounds[this.state.background];
     let size = campaign.sizes[this.state.size];
     let children: Array<RenderElement> = [
         new ImageElement(`${campaign.assetPath}/${background.name.toLowerCase()}_${size.name.toLowerCase()}.png`,
             {x: 0, y: 0, width: size.width, height: size.height}),
     ];
-    if (size.subheader && !this.state.use_default_pic) {
-      children.push(this.toImageElement(size.subheader, `${campaign.assetPath}/${background.name.toLowerCase()}_subheader.png`));
+    if (size.header) {
+      children.push(this.toImageElement(size.header, `${campaign.assetPath}/header_${language.toLowerCase()}.png`));
     }
-    if (this.state.use_default_pic) {
-      children.push(this.toImageElement(size.picture, `${campaign.assetPath}/${background.name.toLowerCase()}_defaultpicture.png`));
+    if (size.defaultPicture && this.state.use_default_pic) {
+      children.push(this.toImageElement(size.defaultPicture, `${campaign.assetPath}/${background.name.toLowerCase()}_defaultpicture_${language.toLowerCase()}.png`));
+    }
+    if (size.antiDefaultPicture && !this.state.use_default_pic) {
+      children.push(this.toImageElement(size.antiDefaultPicture, `${campaign.assetPath}/${background.name.toLowerCase()}_antidefaultpicture_${language.toLowerCase()}.png`));
     }
     if (size.picture && this.state.pic) {
       children.push(this.toImageElement(size.picture, this.state.pic));
@@ -220,18 +227,24 @@ export class TemplateForm extends Component<Props, State> {
           <Grid.Row>
             <Grid.Column width={8}>
               <Form>
+                <Form.Field>
+                  <label>Background</label>
+                  <Select options={this.props.campaign.backgrounds.map((bg, idx) => {return {value: idx, text: bg.name}})}
+                          value={this.state.background}
+                          onChange={(e, data) => this.setState({background: data.value as number})} />
+                </Form.Field>
                 <Form.Group widths="equal">
-                  <Form.Field>
-                    <label>Background</label>
-                    <Select options={this.props.campaign.backgrounds.map((bg, idx) => {return {value: idx, text: bg.name}})}
-                            value={this.state.background}
-                            onChange={(e, data) => this.setState({background: data.value as number})} />
-                  </Form.Field>
                   <Form.Field>
                     <label>Size</label>
                     <Select options={this.props.campaign.sizes.map((size, idx) => {return {value: idx, text: size.name}})}
                             value={this.state.size}
                             onChange={(e, data) => this.setState({size: data.value as number})} />
+                  </Form.Field>
+                  <Form.Field>
+                    <label>Language</label>
+                    <Select options={this.props.campaign.languages.map((language, idx) => {return {value: idx, text: language}})}
+                            value={this.state.language}
+                            onChange={(e, data) => this.setState({language: data.value as number})} />
                   </Form.Field>
                 </Form.Group>
                 <Form.Field>
