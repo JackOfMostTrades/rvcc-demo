@@ -147,47 +147,6 @@ export const DEMO_CAMPAIGN: Campaign = {
                 verticalAlignment: 'center',
                 lineDistribution: 'center',
             },
-        },
-        {
-            name: "4x6",
-            width: 1571,
-            height: 1047,
-            subheader: {
-                x: 0,
-                y: 355,
-                width: 1571,
-                height: 692,
-                horizontalAlignment: 'center',
-                verticalAlignment: 'top',
-            },
-            picture: {
-                x: 0,
-                y: 590,
-                width: 1571,
-                height: 282,
-                horizontalAlignment: 'center',
-            },
-            logo: {
-                x: 1396,
-                y: 872,
-                width: 175,
-                height: 175,
-                horizontalAlignment: 'right',
-            },
-            website: {
-                x: 1571,
-                y: 0,
-                horizontalAlignment: 'right',
-                verticalAlignment: 'top',
-                includeBackgroundFill: true,
-            },
-            programInfo: {
-                x: 698,
-                y: 949,
-                horizontalAlignment: 'center',
-                verticalAlignment: 'center',
-                lineDistribution: 'center',
-            },
-        },
+        }
     ]
 }
