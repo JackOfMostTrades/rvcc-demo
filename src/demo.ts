@@ -35,6 +35,7 @@ export const DEMO_CAMPAIGN: Campaign = {
                 width: 1571,
                 height: 1445,
                 horizontalAlignment: 'center',
+                verticalAlignment: 'bottom',
             },
             antiDefaultPicture: {
                 x: 0,
@@ -50,6 +51,7 @@ export const DEMO_CAMPAIGN: Campaign = {
                 width: 1571,
                 height: 1235,
                 horizontalAlignment: 'center',
+                verticalAlignment: 'bottom',
             },
             logo: {
                 x: 1396,
@@ -92,6 +94,7 @@ export const DEMO_CAMPAIGN: Campaign = {
                 width: 1080,
                 height: 715,
                 horizontalAlignment: 'center',
+                verticalAlignment: 'bottom',
             },
             antiDefaultPicture: {
                 x: 0,
@@ -107,6 +110,7 @@ export const DEMO_CAMPAIGN: Campaign = {
                 width: 1080,
                 height: 493,
                 horizontalAlignment: 'center',
+                verticalAlignment: 'bottom',
             },
             logo: {
                 x: 978,
@@ -149,6 +153,7 @@ export const DEMO_CAMPAIGN: Campaign = {
                 width: 1545,
                 height: 1322,
                 horizontalAlignment: 'center',
+                verticalAlignment: 'bottom',
             },
             antiDefaultPicture: {
                 x: 0,
@@ -164,6 +169,7 @@ export const DEMO_CAMPAIGN: Campaign = {
                 width: 1545,
                 height: 1112,
                 horizontalAlignment: 'center',
+                verticalAlignment: 'bottom',
             },
             logo: {
                 x: 1357,
@@ -181,6 +187,65 @@ export const DEMO_CAMPAIGN: Campaign = {
             },
             programInfo: {
                 x: 678,
+                y: 1896,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'center',
+                lineDistribution: 'center',
+            },
+        },
+        {
+            name: "11x17",
+            label: "11x17",
+            width: 1294,
+            height: 2000,
+            header: {
+                x: 0,
+                y: 223,
+                width: 1294,
+                height: 1777,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'top',
+            },
+            defaultPicture: {
+                x: 0,
+                y: 438,
+                width: 1294,
+                height: 1375,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'bottom',
+            },
+            antiDefaultPicture: {
+                x: 0,
+                y: 364,
+                width: 1294,
+                height: 1636,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'top',
+            },
+            picture: {
+                x: 0,
+                y: 692,
+                width: 1294,
+                height: 1121,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'bottom',
+            },
+            logo: {
+                x: 1107,
+                y: 1813,
+                width: 187,
+                height: 187,
+                horizontalAlignment: 'right',
+            },
+            website: {
+                x: 1294,
+                y: 0,
+                horizontalAlignment: 'right',
+                verticalAlignment: 'top',
+                includeBackgroundFill: true,
+            },
+            programInfo: {
+                x: 553,
                 y: 1896,
                 horizontalAlignment: 'center',
                 verticalAlignment: 'center',
