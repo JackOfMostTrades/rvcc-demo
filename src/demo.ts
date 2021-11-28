@@ -5,14 +5,14 @@ export const DEMO_CAMPAIGN: Campaign = {
     languages: ["English", "Spanish"],
     backgrounds: [
         {name: "Boundaries", color: "#ffbd59"},
-        {name: "Difference", color: "#4ea23e"},
         {name: "Experience", color: "#9d7bd9"},
         {name: "Gentle", color: "#ccb4ae"},
-        {name: "Pace", color: "#64cca3"},
+        {name: "Healing", color: "#64cca3"},
         {name: "Progress", color: "#f7e367"},
         {name: "Resilient", color: "#b1a1fa"},
         {name: "Space", color: "#f36e80"},
         {name: "Valid", color: "#7acbef"},
+        {name: "Voice", color: "#4ea23e"},
         {name: "Worthy", color: "#f09333"},
     ],
     sizes: [
