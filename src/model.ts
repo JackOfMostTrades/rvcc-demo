@@ -1,7 +1,6 @@
-import {Image} from "semantic-ui-react";
-
 export interface SizeSpec {
     name: string
+    label: string
     width: number
     height: number
 

@@ -5,19 +5,20 @@ export const DEMO_CAMPAIGN: Campaign = {
     languages: ["English", "Spanish"],
     backgrounds: [
         {name: "Boundaries", color: "#ffbd59"},
-        {name: "Deserve", color: "#f36e80"},
         {name: "Difference", color: "#4ea23e"},
         {name: "Experience", color: "#9d7bd9"},
         {name: "Gentle", color: "#ccb4ae"},
         {name: "Pace", color: "#64cca3"},
         {name: "Progress", color: "#f7e367"},
         {name: "Resilient", color: "#b1a1fa"},
+        {name: "Space", color: "#f36e80"},
         {name: "Valid", color: "#7acbef"},
         {name: "Worthy", color: "#f09333"},
     ],
     sizes: [
         {
             name: "11x14",
+            label: "11x14",
             width: 1571,
             height: 2000,
             header: {
@@ -73,7 +74,8 @@ export const DEMO_CAMPAIGN: Campaign = {
             },
         },
         {
-            name: "Square",
+            name: "square",
+            label: "Social media post",
             width: 1571,
             height: 1571,
             header: {

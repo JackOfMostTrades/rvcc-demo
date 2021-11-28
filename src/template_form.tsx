@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Container,
+  Dimmer,
   Form,
   Grid,
   Header,
@@ -187,7 +188,7 @@ export class TemplateForm extends Component<Props, State> {
     let background = campaign.backgrounds[this.state.background];
     let size = campaign.sizes[this.state.size];
     let children: Array<RenderElement> = [
-        new ImageElement(`${campaign.assetPath}/${background.name.toLowerCase()}_${size.name.toLowerCase()}.png`,
+        new ImageElement(`${campaign.assetPath}/${background.name.toLowerCase()}_${size.name}.png`,
             {x: 0, y: 0, width: size.width, height: size.height}),
     ];
     if (size.header) {
@@ -236,7 +237,7 @@ export class TemplateForm extends Component<Props, State> {
                 <Form.Group widths="equal">
                   <Form.Field>
                     <label>Size</label>
-                    <Select options={this.props.campaign.sizes.map((size, idx) => {return {value: idx, text: size.name}})}
+                    <Select options={this.props.campaign.sizes.map((size, idx) => {return {value: idx, text: size.label}})}
                             value={this.state.size}
                             onChange={(e, data) => this.setState({size: data.value as number})} />
                   </Form.Field>
@@ -279,7 +280,11 @@ export class TemplateForm extends Component<Props, State> {
                   </Form.Field>
                 </Form.Group>
                 <Form.Field>
-                  <ImageSelectFormField disabled={this.state.use_default_pic} value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
+                  <Dimmer.Dimmable as={Segment} dimmed={this.state.use_default_pic}>
+                    <Dimmer inverted active={this.state.use_default_pic} />
+                    <ImageSelectFormField disabled={this.state.use_default_pic} value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
+                    <p>We recommend using an image with a transparent background. Consider using <a href="https://www.adobe.com/express/feature/image/remove-background">this free tool</a> if you need to remove the background from an image.</p>
+                  </Dimmer.Dimmable>
                 </Form.Field>
 
                 <Form.Field>
