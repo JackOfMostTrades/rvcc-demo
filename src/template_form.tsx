@@ -146,12 +146,12 @@ export class TemplateForm extends Component<Props, State> {
   }
 
 
-  private toImageElement(spec: ImageSpec|undefined, href: string|undefined): ImageElement|undefined {
+  private toImageElement(key: string, spec: ImageSpec|undefined, href: string|undefined): ImageElement|undefined {
     if (!spec || !href) {
       return undefined;
     }
     let background = this.props.campaign.backgrounds[this.state.background];
-    return new ImageElement(href, {
+    return new ImageElement(key, href, {
       x: spec.x,
       y: spec.y,
       width: spec.width,
@@ -163,12 +163,12 @@ export class TemplateForm extends Component<Props, State> {
     });
   }
 
-  private toTextElement(spec: TextSpec|undefined, text: string|undefined): TextElement|undefined {
+  private toTextElement(key: string, spec: TextSpec|undefined, text: string|undefined): TextElement|undefined {
     if (!spec || !text) {
       return undefined;
     }
     let background = this.props.campaign.backgrounds[this.state.background];
-    return new TextElement(text, {
+    return new TextElement(key, text, {
       x: spec.x,
       y: spec.y,
       fontSize: this.state.fontSize,
@@ -188,29 +188,29 @@ export class TemplateForm extends Component<Props, State> {
     let background = campaign.backgrounds[this.state.background];
     let size = campaign.sizes[this.state.size];
     let children: Array<RenderElement> = [
-        new ImageElement(`${campaign.assetPath}/${background.name.toLowerCase()}_${size.name}.png`,
+        new ImageElement("background", `${campaign.assetPath}/${background.name.toLowerCase()}_${size.name}.png`,
             {x: 0, y: 0, width: size.width, height: size.height}),
     ];
     if (size.header) {
-      children.push(this.toImageElement(size.header, `${campaign.assetPath}/header_${language.toLowerCase()}.png`));
+      children.push(this.toImageElement("header", size.header, `${campaign.assetPath}/header_${language.toLowerCase()}.png`));
     }
     if (size.defaultPicture && this.state.use_default_pic) {
-      children.push(this.toImageElement(size.defaultPicture, `${campaign.assetPath}/${background.name.toLowerCase()}_defaultpicture_${language.toLowerCase()}.png`));
+      children.push(this.toImageElement("defaultPicture", size.defaultPicture, `${campaign.assetPath}/${background.name.toLowerCase()}_defaultpicture_${language.toLowerCase()}.png`));
     }
     if (size.antiDefaultPicture && !this.state.use_default_pic) {
-      children.push(this.toImageElement(size.antiDefaultPicture, `${campaign.assetPath}/${background.name.toLowerCase()}_antidefaultpicture_${language.toLowerCase()}.png`));
+      children.push(this.toImageElement("antiDefaultPicture", size.antiDefaultPicture, `${campaign.assetPath}/${background.name.toLowerCase()}_antidefaultpicture_${language.toLowerCase()}.png`));
     }
     if (size.picture && this.state.pic) {
-      children.push(this.toImageElement(size.picture, this.state.pic));
+      children.push(this.toImageElement("picture", size.picture, this.state.pic));
     }
     if (size.logo && this.state.logo) {
-      children.push(this.toImageElement(size.logo, this.state.logo));
+      children.push(this.toImageElement("logo", size.logo, this.state.logo));
     }
     if (size.website && this.state.website) {
-      children.push(this.toTextElement(size.website, this.state.website));
+      children.push(this.toTextElement("website", size.website, this.state.website));
     }
     if (size.programInfo && this.state.program_info) {
-      children.push(this.toTextElement(size.programInfo, this.state.program_info));
+      children.push(this.toTextElement("program_info", size.programInfo, this.state.program_info));
     }
     return children;
   }

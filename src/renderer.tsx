@@ -3,7 +3,7 @@ import * as PDFKit from "pdfkit";
 import {fetchFontTtf} from "./fonts";
 
 export interface RenderElement {
-    renderToReact(key: any): ReactNode;
+    renderToReact(): ReactNode;
     renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void>;
     renderToPdf(doc: PDFKit.PDFDocument): Promise<void>;
 }
@@ -43,6 +43,8 @@ class BgSvgTextNode extends Component<BgSvgTextNodeProps, {extents?: DOMRect}> {
 
     componentDidUpdate(prevProps: BgSvgTextNodeProps) {
         if (prevProps.text !== this.props.text
+                || prevProps.textProps.x !== this.props.textProps.x
+                || prevProps.textProps.y !== this.props.textProps.y
                 || prevProps.textProps.fontFamily !== this.props.textProps.fontFamily
                 || prevProps.textProps.fontSize !== this.props.textProps.fontSize) {
             this.updateExtents();
@@ -72,10 +74,12 @@ interface TextElementLine {
 }
 
 export class TextElement implements RenderElement {
+    private key: string
     private text: string
     private options: TextElementOptions;
 
-    constructor(text: string, options: TextElementOptions) {
+    constructor(key: string, text: string, options: TextElementOptions) {
+        this.key = key;
         this.text = text;
         this.options = options;
     }
@@ -113,7 +117,7 @@ export class TextElement implements RenderElement {
         return result;
     }
 
-    renderToReact(key: any): React.ReactNode {
+    renderToReact(): React.ReactNode {
         if (!this.text) {
             return null;
         }
@@ -139,7 +143,7 @@ export class TextElement implements RenderElement {
             }} bgFill={this.options.bgFill} bgPadding={this.options.bgPadding}/>);
         }
 
-        return <Fragment key={key} children={nodes} />;
+        return <Fragment key={this.key} children={nodes} />;
     }
 
     renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void> {
@@ -256,15 +260,17 @@ export interface ImageElementOptions {
 }
 
 export class ImageElement implements RenderElement {
+    private key: string
     private href: string;
     private options: ImageElementOptions;
 
-    constructor(href: string, options: ImageElementOptions) {
+    constructor(key: string, href: string, options: ImageElementOptions) {
+        this.key = key;
         this.href = href;
         this.options = options;
     }
 
-    renderToReact(key: any): React.ReactNode {
+    renderToReact(): React.ReactNode {
         if (!this.href) {
             return null;
         }
@@ -289,7 +295,7 @@ export class ImageElement implements RenderElement {
         alignment += ' meet';
 
         let img = <image
-            key={key}
+            key={this.key}
             href={this.href}
             x={this.options.x}
             y={this.options.y}
@@ -300,7 +306,7 @@ export class ImageElement implements RenderElement {
 
         if (this.options.bgFill) {
             const bgPadding = this.options.bgPadding || 0;
-            return <Fragment key={key}>
+            return <Fragment key={this.key}>
                 <rect x={this.options.x - bgPadding}
                       y={this.options.y - bgPadding}
                       width={this.options.width + 2*bgPadding}
@@ -418,7 +424,7 @@ export class ReactRenderer implements Renderer<ReactNode> {
     render(width: number, height: number, children: Array<RenderElement>): ReactNode {
         let reactChildren: Array<ReactNode> = [];
         for (let i = 0; i < children.length; i++) {
-            reactChildren.push(children[i].renderToReact(i));
+            reactChildren.push(children[i].renderToReact());
         }
         return <svg width="100%" viewBox={`0 0 ${width} ${height}`} children={reactChildren} />;
     }
