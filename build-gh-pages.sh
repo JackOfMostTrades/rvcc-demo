@@ -13,7 +13,7 @@ git branch -D gh-pages
 git checkout --orphan gh-pages
 git rm -r --cached .
 rm -f .gitignore bingo/.gitignore
-git add dist/ index.html blob-stream.js images/
+git add dist/ index.html blob-stream.js images/ healthy/
 git add bingo/dist/ bingo/index.html bingo/images/
 git commit -m "Github Pages Build (${GITREV})"
 git push --force -u origin gh-pages
