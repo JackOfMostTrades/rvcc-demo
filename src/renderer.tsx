@@ -140,6 +140,7 @@ export class TextElement implements RenderElement {
                 fontSize: this.options.fontSize,
                 fill: this.options.color,
                 fontFamily: this.options.fontFamily,
+                dominantBaseline: 'bottom',
             }} bgFill={this.options.bgFill} bgPadding={this.options.bgPadding}/>);
         }
 
@@ -169,20 +170,14 @@ export class TextElement implements RenderElement {
             let line = lines[i];
 
             if (this.options.bgFill) {
-                let fillX = line.x;
-                let fillHeight = this.options.fontSize || 0;
                 let metrics = ctx.measureText(line.line);
-                let width = metrics.width;
-                if (this.options.horizontalAlign === 'center') {
-                    fillX -= width/2;
-                } else if (this.options.horizontalAlign === 'right') {
-                    fillX -= width;
-                }
-
+                let rectX = line.x - metrics.actualBoundingBoxLeft;
+                let width = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
+                let height = this.options.fontSize || 0;
                 let padding = this.options.bgPadding || 0;
 
                 ctx.fillStyle = this.options.bgFill;
-                ctx.fillRect(fillX - padding, line.y - fillHeight - padding, width + 2*padding, fillHeight + 2*padding);
+                ctx.fillRect(rectX - padding, line.y - height - padding, width + 2*padding, height + 2*padding);
             }
 
             if (this.options.color) {
@@ -215,7 +210,7 @@ export class TextElement implements RenderElement {
 
                 let options: PDFKit.Mixins.TextOptions = {
                     lineBreak: false,
-                    baseline: 'alphabetic',
+                    baseline: 'bottom',
                 }
 
                 let lines = this.getLinesToRender();
@@ -232,8 +227,8 @@ export class TextElement implements RenderElement {
 
                     if (this.options.bgFill) {
                         let padding = this.options.bgPadding || 0;
-                        let height = doc.heightOfString(line.line, options);
-                        doc.rect(x, line.y-height-padding, width+2*padding, height+2*padding);
+                        let height = this.options.fontSize || 0;
+                        doc.rect(x - padding, line.y-height-padding, width+2*padding, height+2*padding);
                         doc.fill(this.options.bgFill);
                     }
 
@@ -438,7 +433,7 @@ export class CanvasRenderer implements Renderer<Promise<HTMLCanvasElement>> {
 
         let chain: Promise<void> = Promise.resolve();
         let ctx = canvas.getContext('2d');
-        ctx.textBaseline = 'alphabetic';
+        ctx.textBaseline = 'bottom';
         for (let i = 0; i < children.length; i++) {
             let child = children[i];
             chain = chain.then(() => child.renderToCanvas(ctx));
