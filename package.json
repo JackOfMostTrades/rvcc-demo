@@ -16,7 +16,8 @@
     "react-dom": "^17.0.2",
     "react-image-crop": "^9.0.5",
     "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^2.0.4"
+    "semantic-ui-react": "^2.0.4",
+    "string-template": "^1.0.0"
   },
   "devDependencies": {
     "@types/blob-stream": "^0.1.30",
@@ -24,6 +25,7 @@
     "@types/react": "^17.0.36",
     "@types/react-color": "^3.0.6",
     "@types/react-dom": "^17.0.11",
+    "@types/string-template": "^1.0.2",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.2",
     "webpack": "^5.64.2",

@@ -58,6 +58,12 @@ export interface TextSpec {
 
 export interface Campaign {
     assetPath: string
+    assetPaths?: {
+        background?: string
+        header?: string
+        defaultPicture?: string
+        antiDefaultPicture?: string
+    }
     backgrounds: BackgroundSpec[]
     sizes: SizeSpec[]
     languages: string[]

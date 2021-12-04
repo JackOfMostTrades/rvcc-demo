@@ -23,7 +23,7 @@ export default class ColorPicker extends Component<Props, State> {
     }
 
     // set up a listener for page clicks
-    componentWillMount(){
+    componentDidMount(){
         document.addEventListener('mousedown', this.handlePageClick, false)
     }
 

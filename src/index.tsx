@@ -4,13 +4,12 @@ import {Container, Header} from "semantic-ui-react";
 import {FONTS} from "./fonts";
 import {TemplateForm} from "./template_form";
 import {DEMO_CAMPAIGN} from "./demo";
+import {Campaign} from "./model";
+import {HEALTHY_CAMPAIGN} from "./healthy_campaign";
 
-class Demo extends Component<{}, {template: number}> {
-    constructor(props: {}) {
+class Demo extends Component<{campaign: Campaign}, {}> {
+    constructor(props: {campaign: Campaign}) {
         super(props);
-        this.state = {
-            template: 0
-        }
     }
 
     render() {
@@ -18,7 +17,7 @@ class Demo extends Component<{}, {template: number}> {
             <Header as="h1">
                 RVCC Demo
             </Header>
-            <TemplateForm campaign={DEMO_CAMPAIGN} />
+            <TemplateForm campaign={this.props.campaign} />
         </Container>
 
     }
@@ -39,4 +38,8 @@ function preloadFonts() {
 }
 
 preloadFonts();
-render(createElement(Demo), document.getElementById('demo'));
+let campaign: Campaign = DEMO_CAMPAIGN;
+if (new URLSearchParams(window.location.search).get('campaign') === 'healthy') {
+    campaign = HEALTHY_CAMPAIGN;
+}
+render(createElement(Demo, {campaign: campaign}), document.getElementById('demo'));

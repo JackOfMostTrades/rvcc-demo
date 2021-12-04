@@ -19,6 +19,7 @@ import {CropBox} from "./cropbox";
 import {FONTS} from "./fonts";
 import {Campaign, ImageSpec, TextSpec} from "./model";
 import ColorPicker from "./color_picker";
+const format = require("string-template");
 
 export interface Props {
   campaign: Campaign
@@ -191,18 +192,29 @@ export class TemplateForm extends Component<Props, State> {
     let language = campaign.languages[this.state.language].toLowerCase();
     let background = campaign.backgrounds[this.state.background].name.toLowerCase().replace(/ /g, '_');
     let size = campaign.sizes[this.state.size];
-    let children: Array<RenderElement> = [
-        new ImageElement("background", `${campaign.assetPath}/${background}_${size.name}.png`,
-            {x: 0, y: 0, width: size.width, height: size.height}),
-    ];
+
+    let templateOptions = {
+      language: language,
+      background: background,
+      size: size.name,
+    };
+    let children: Array<RenderElement> = [];
+    {
+      let pattern = campaign.assetPaths?.background || '{background}_{size}.png';
+      children.push(new ImageElement("background", campaign.assetPath + "/" + format(pattern, templateOptions),
+          {x: 0, y: 0, width: size.width, height: size.height}));
+    }
     if (size.header) {
-      children.push(this.toImageElement("header", size.header, `${campaign.assetPath}/header_${language}.png`));
+      let pattern = campaign.assetPaths?.header || "header_{language}.png";
+      children.push(this.toImageElement("header", size.header, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.defaultPicture && this.state.use_default_pic) {
-      children.push(this.toImageElement("defaultPicture", size.defaultPicture, `${campaign.assetPath}/${background}_defaultpicture_${language}.png`));
+      let pattern = campaign.assetPaths?.defaultPicture || "{background}_defaultpicture_{language}.png";
+      children.push(this.toImageElement("defaultPicture", size.defaultPicture, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.antiDefaultPicture && !this.state.use_default_pic) {
-      children.push(this.toImageElement("antiDefaultPicture", size.antiDefaultPicture, `${campaign.assetPath}/${background}_antidefaultpicture_${language}.png`));
+      let pattern = campaign.assetPaths?.antiDefaultPicture || "{background}_antidefaultpicture_{language}.png";
+      children.push(this.toImageElement("antiDefaultPicture", size.antiDefaultPicture, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.picture && this.state.pic) {
       children.push(this.toImageElement("picture", size.picture, this.state.pic));
