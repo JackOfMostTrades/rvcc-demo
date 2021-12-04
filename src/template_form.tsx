@@ -188,21 +188,21 @@ export class TemplateForm extends Component<Props, State> {
 
   private getRenderChildren(): Array<RenderElement> {
     let campaign = this.props.campaign;
-    let language = campaign.languages[this.state.language];
-    let background = campaign.backgrounds[this.state.background];
+    let language = campaign.languages[this.state.language].toLowerCase();
+    let background = campaign.backgrounds[this.state.background].name.toLowerCase().replace(/ /g, '_');
     let size = campaign.sizes[this.state.size];
     let children: Array<RenderElement> = [
-        new ImageElement("background", `${campaign.assetPath}/${background.name.toLowerCase()}_${size.name}.png`,
+        new ImageElement("background", `${campaign.assetPath}/${background}_${size.name}.png`,
             {x: 0, y: 0, width: size.width, height: size.height}),
     ];
     if (size.header) {
-      children.push(this.toImageElement("header", size.header, `${campaign.assetPath}/header_${language.toLowerCase()}.png`));
+      children.push(this.toImageElement("header", size.header, `${campaign.assetPath}/header_${language}.png`));
     }
     if (size.defaultPicture && this.state.use_default_pic) {
-      children.push(this.toImageElement("defaultPicture", size.defaultPicture, `${campaign.assetPath}/${background.name.toLowerCase()}_defaultpicture_${language.toLowerCase()}.png`));
+      children.push(this.toImageElement("defaultPicture", size.defaultPicture, `${campaign.assetPath}/${background}_defaultpicture_${language}.png`));
     }
     if (size.antiDefaultPicture && !this.state.use_default_pic) {
-      children.push(this.toImageElement("antiDefaultPicture", size.antiDefaultPicture, `${campaign.assetPath}/${background.name.toLowerCase()}_antidefaultpicture_${language.toLowerCase()}.png`));
+      children.push(this.toImageElement("antiDefaultPicture", size.antiDefaultPicture, `${campaign.assetPath}/${background}_antidefaultpicture_${language}.png`));
     }
     if (size.picture && this.state.pic) {
       children.push(this.toImageElement("picture", size.picture, this.state.pic));
