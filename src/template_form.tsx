@@ -18,6 +18,7 @@ import {CanvasRenderer, ImageElement, PdfRenderer, ReactRenderer, RenderElement,
 import {CropBox} from "./cropbox";
 import {FONTS} from "./fonts";
 import {Campaign, ImageSpec, TextSpec} from "./model";
+import ColorPicker from "./color_picker";
 
 export interface Props {
   campaign: Campaign
@@ -34,6 +35,7 @@ interface State {
   pic?: string
   font?: string
   fontSize?: number
+  fontColor?: string
 
   cropModalHref?: string
   cropModalCallback?: (dataUrl: string) => void
@@ -65,6 +67,7 @@ export class TemplateForm extends Component<Props, State> {
       use_default_pic: true,
       font: 'Quicksand',
       fontSize: 55,
+      fontColor: "#000000",
     };
     this.setImage = this.setImage.bind(this);
   }
@@ -81,6 +84,7 @@ export class TemplateForm extends Component<Props, State> {
       use_default_pic: true,
       font: 'Quicksand',
       fontSize: 55,
+      fontColor: '#000000',
       cropModalHref: undefined,
       cropModalCallback: undefined,
     });
@@ -172,7 +176,7 @@ export class TemplateForm extends Component<Props, State> {
       x: spec.x,
       y: spec.y,
       fontSize: this.state.fontSize,
-      color: 'black',
+      color: this.state.fontColor,
       fontFamily: this.state.font + ', sans-serif',
       horizontalAlign: spec.horizontalAlignment,
       verticalAlign: spec.verticalAlignment,
@@ -293,10 +297,18 @@ export class TemplateForm extends Component<Props, State> {
                           value={this.state.font} text={this.state.font}
                           onChange={(e, data) => this.setState({font: data.value as string})} />
                 </Form.Field>
-                <Form.Field>
-                  <label>Font Size</label>
-                  <Input type="number" value={this.state.fontSize} onChange={e => this.setState({fontSize: parseInt(e.target.value)})} />
-                </Form.Field>
+                <Form.Group widths="equal">
+                  <Form.Field>
+                    <label>Font Size</label>
+                    <Input type="number" value={this.state.fontSize} onChange={e => this.setState({fontSize: parseInt(e.target.value)})} />
+                  </Form.Field>
+                  <Form.Field>
+                    <label>Font Color</label>
+                    <ColorPicker
+                      color={this.state.fontColor}
+                      onChange={color => this.setState({fontColor: color })} />
+                  </Form.Field>
+                </Form.Group>
 
                 <Button type="button" color="black" onClick={() => this.reset()}>Reset</Button>
                 <Button type="button" primary icon labelPosition="left" onClick={() => this.downloadPng()}><Icon name="download" />Download (PNG)</Button>
