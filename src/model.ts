@@ -11,6 +11,8 @@ export interface SizeSpec {
     // A non-editable picture that gets displayed when defaultPicture is disabled in the form. This is used to include a subheader
     // containing text that is in the default picture. Image source can vary depending on language
     antiDefaultPicture?: ImageSpec
+    // An image that will be rendered on top of all other images
+    foreground?: ImageSpec
 
     // The user-uploaded picture that can be chosen if defaultPicture gets disabled.
     picture?: ImageSpec
@@ -60,6 +62,7 @@ export interface Campaign {
     assetPath: string
     assetPaths?: {
         background?: string
+        foreground?: string
         header?: string
         defaultPicture?: string
         antiDefaultPicture?: string

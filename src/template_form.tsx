@@ -1,4 +1,4 @@
-import {Component, ReactNode} from 'react';
+import {Component, Fragment, ReactNode} from 'react';
 import {
   Button,
   Checkbox,
@@ -205,7 +205,7 @@ export class TemplateForm extends Component<Props, State> {
           {x: 0, y: 0, width: size.width, height: size.height}));
     }
     if (size.header) {
-      let pattern = campaign.assetPaths?.header || "header_{language}.png";
+      let pattern = campaign.assetPaths?.header || "{background}_header_{language}.png";
       children.push(this.toImageElement("header", size.header, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.defaultPicture && this.state.use_default_pic) {
@@ -228,6 +228,10 @@ export class TemplateForm extends Component<Props, State> {
     if (size.programInfo && this.state.program_info) {
       children.push(this.toTextElement("program_info", size.programInfo, this.state.program_info));
     }
+    if (size.foreground) {
+      let pattern = campaign.assetPaths?.foreground || "{background}_foreground.png";
+      children.push(this.toImageElement("foreground", size.foreground, campaign.assetPath + "/" + format(pattern, templateOptions)));
+    }
     return children;
   }
 
@@ -237,6 +241,12 @@ export class TemplateForm extends Component<Props, State> {
   }
 
   render() {
+    let hasDefaultPic = this.props.campaign.sizes[this.state.size].defaultPicture !== undefined;
+    let picSelectFragment = <Fragment>
+      <ImageSelectFormField disabled={hasDefaultPic && this.state.use_default_pic} value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
+      <p>We recommend using an image with a transparent background. Consider using <a href="https://www.adobe.com/express/feature/image/remove-background">this free tool</a> if you need to remove the background from an image.</p>
+    </Fragment>
+
     return <Container>
       <Segment>
         <CropBox href={this.state.cropModalHref} onComplete={this.state.cropModalCallback} />
@@ -284,24 +294,31 @@ export class TemplateForm extends Component<Props, State> {
                   <ImageSelectFormField value={this.state.logo} clear={() => this.setState({logo: undefined})} setImage={(files) => this.setImage('logo', files)} />
                 </Form.Field>
 
-                <Form.Group inline>
-                  <label>Picture</label>
-                  <Form.Field>
-                    <Checkbox toggle label="Use default picture" checked={this.state.use_default_pic} onChange={(e, data) => {
-                      this.setState({
-                        use_default_pic: data.checked,
-                        pic: data.checked ? undefined : this.state.pic,
-                      });
-                    }} />
-                  </Form.Field>
-                </Form.Group>
-                <Form.Field>
-                  <Dimmer.Dimmable as={Segment} dimmed={this.state.use_default_pic}>
-                    <Dimmer inverted active={this.state.use_default_pic} />
-                    <ImageSelectFormField disabled={this.state.use_default_pic} value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
-                    <p>We recommend using an image with a transparent background. Consider using <a href="https://www.adobe.com/express/feature/image/remove-background">this free tool</a> if you need to remove the background from an image.</p>
-                  </Dimmer.Dimmable>
-                </Form.Field>
+                {hasDefaultPic ? <Fragment>
+                      <Form.Group inline>
+                        <label>Picture</label>
+                        <Form.Field>
+                          <Checkbox toggle label="Use default picture" checked={this.state.use_default_pic} onChange={(e, data) => {
+                            this.setState({
+                              use_default_pic: data.checked,
+                              pic: data.checked ? undefined : this.state.pic,
+                            });
+                          }} />
+                        </Form.Field>
+                      </Form.Group>
+                      <Form.Field>
+                        <Dimmer.Dimmable as={Segment} dimmed={this.state.use_default_pic}>
+                          <Dimmer inverted active={this.state.use_default_pic} />
+                          {picSelectFragment}
+                        </Dimmer.Dimmable>
+                      </Form.Field>
+                    </Fragment>
+                    :
+                    <Form.Field>
+                      <label>Picture</label>
+                      {picSelectFragment}
+                    </Form.Field>
+                }
 
                 <Form.Field>
                   <label>Font</label>

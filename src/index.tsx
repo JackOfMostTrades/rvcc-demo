@@ -6,6 +6,7 @@ import {TemplateForm} from "./template_form";
 import {DEMO_CAMPAIGN} from "./demo";
 import {Campaign} from "./model";
 import {HEALTHY_CAMPAIGN} from "./healthy_campaign";
+import {FRAME_CAMPAIGN} from "./frame_campaign";
 
 class Demo extends Component<{campaign: Campaign}, {}> {
     constructor(props: {campaign: Campaign}) {
@@ -38,8 +39,20 @@ function preloadFonts() {
 }
 
 preloadFonts();
-let campaign: Campaign = DEMO_CAMPAIGN;
-if (new URLSearchParams(window.location.search).get('campaign') === 'healthy') {
-    campaign = HEALTHY_CAMPAIGN;
+let campaign: Campaign;
+let campaignName: string = new URLSearchParams(window.location.search).get('campaign') || 'demo';
+switch (campaignName) {
+    case 'demo':
+        campaign = DEMO_CAMPAIGN;
+        break;
+    case 'healthy':
+        campaign = HEALTHY_CAMPAIGN;
+        break;
+    case 'frame':
+        campaign = FRAME_CAMPAIGN;
+        break;
+    default:
+        campaign = DEMO_CAMPAIGN;
+        break;
 }
 render(createElement(Demo, {campaign: campaign}), document.getElementById('demo'));
