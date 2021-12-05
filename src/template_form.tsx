@@ -173,6 +173,7 @@ export class TemplateForm extends Component<Props, State> {
       height: spec.height,
       horizontalAlign: spec.horizontalAlignment,
       verticalAlign: spec.verticalAlignment,
+      scaleStrategy: spec.scaleStrategy,
       bgFill: spec.includeBackgroundFill ? background.color : undefined,
       bgPadding: 0,
     });
@@ -214,16 +215,16 @@ export class TemplateForm extends Component<Props, State> {
       children.push(new ImageElement("background", campaign.assetPath + "/" + format(pattern, templateOptions),
           {x: 0, y: 0, width: size.width, height: size.height}));
     }
-    if (size.header) {
-      let pattern = campaign.assetPaths?.header || "{background}_header_{language}.png";
-      children.push(this.toImageElement("header", size.header, campaign.assetPath + "/" + format(pattern, templateOptions)));
-    }
     if (size.defaultPicture && this.state.use_default_pic) {
       let pattern = campaign.assetPaths?.defaultPicture || "{background}_defaultpicture_{language}.png";
       children.push(this.toImageElement("defaultPicture", size.defaultPicture, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.picture && this.state.picture) {
       children.push(this.toImageElement("picture", size.picture, this.state.picture));
+    }
+    if (size.header) {
+      let pattern = campaign.assetPaths?.header || "{background}_header_{language}.png";
+      children.push(this.toImageElement("header", size.header, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.antiDefaultPicture && !this.state.use_default_pic) {
       let pattern = campaign.assetPaths?.antiDefaultPicture || "{background}_antidefaultpicture_{language}.png";
