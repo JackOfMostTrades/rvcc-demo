@@ -33,13 +33,14 @@ interface State {
   program_info?: string
   logo?: string
   use_default_pic?: boolean
-  pic?: string
+  picture?: string
   font?: string
   fontSize?: number
   fontColor?: string
 
   cropModalHref?: string
   cropModalCallback?: (dataUrl: string) => void
+  cropModalAspectRatio?: number
 }
 
 class ImageSelectFormField extends Component<{value?: string, disabled?: boolean, clear: () => void, setImage: (files: FileList) => void}, {}> {
@@ -81,17 +82,18 @@ export class TemplateForm extends Component<Props, State> {
       website: "",
       program_info: "",
       logo: undefined,
-      pic: undefined,
+      picture: undefined,
       use_default_pic: true,
       font: 'Quicksand',
       fontSize: 55,
       fontColor: '#000000',
       cropModalHref: undefined,
       cropModalCallback: undefined,
+      cropModalAspectRatio: undefined,
     });
   }
 
-  private setImage(fieldName: 'logo' | 'pic', files: FileList) {
+  private setImage(fieldName: 'logo' | 'picture', files: FileList) {
     if (!files || files.length === 0) {
       this.setState({[fieldName]: undefined});
       return;
@@ -102,13 +104,21 @@ export class TemplateForm extends Component<Props, State> {
       alert("File is not an image: " + file.type);
       return;
     }
+
+    let spec: ImageSpec = this.props.campaign.sizes[this.state.size][fieldName];
+    let aspect: number|undefined;
+    if (spec && spec.enforceAspectRatio) {
+      aspect = spec.width / spec.height;
+    }
+
     let reader = new FileReader();
     reader.addEventListener('load', function (e) {
       self.setState({
         cropModalHref: e.target.result as string,
         cropModalCallback: (dataUrl) => {
           self.setState({cropModalHref: undefined, cropModalCallback: undefined, [fieldName]: dataUrl});
-        }
+        },
+        cropModalAspectRatio: aspect,
       });
     });
     reader.readAsDataURL(file);
@@ -212,12 +222,12 @@ export class TemplateForm extends Component<Props, State> {
       let pattern = campaign.assetPaths?.defaultPicture || "{background}_defaultpicture_{language}.png";
       children.push(this.toImageElement("defaultPicture", size.defaultPicture, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
+    if (size.picture && this.state.picture) {
+      children.push(this.toImageElement("picture", size.picture, this.state.picture));
+    }
     if (size.antiDefaultPicture && !this.state.use_default_pic) {
       let pattern = campaign.assetPaths?.antiDefaultPicture || "{background}_antidefaultpicture_{language}.png";
       children.push(this.toImageElement("antiDefaultPicture", size.antiDefaultPicture, campaign.assetPath + "/" + format(pattern, templateOptions)));
-    }
-    if (size.picture && this.state.pic) {
-      children.push(this.toImageElement("picture", size.picture, this.state.pic));
     }
     if (size.logo && this.state.logo) {
       children.push(this.toImageElement("logo", size.logo, this.state.logo));
@@ -241,15 +251,9 @@ export class TemplateForm extends Component<Props, State> {
   }
 
   render() {
-    let hasDefaultPic = this.props.campaign.sizes[this.state.size].defaultPicture !== undefined;
-    let picSelectFragment = <Fragment>
-      <ImageSelectFormField disabled={hasDefaultPic && this.state.use_default_pic} value={this.state.pic} clear={() => this.setState({pic: undefined})} setImage={(files) => this.setImage('pic', files)} />
-      <p>We recommend using an image with a transparent background. Consider using <a href="https://www.adobe.com/express/feature/image/remove-background">this free tool</a> if you need to remove the background from an image.</p>
-    </Fragment>
-
     return <Container>
       <Segment>
-        <CropBox href={this.state.cropModalHref} onComplete={this.state.cropModalCallback} />
+        <CropBox href={this.state.cropModalHref} onComplete={this.state.cropModalCallback} aspect={this.state.cropModalAspectRatio} />
         <Grid>
           <Grid.Row>
             <Grid.Column width={8}>
@@ -291,34 +295,30 @@ export class TemplateForm extends Component<Props, State> {
                 </Form.Field>
                 <Form.Field>
                   <label>Logo</label>
-                  <ImageSelectFormField value={this.state.logo} clear={() => this.setState({logo: undefined})} setImage={(files) => this.setImage('logo', files)} />
+                  <ImageSelectFormField value={this.state.logo}
+                                        clear={() => this.setState({logo: undefined})}
+                                        setImage={(files) => this.setImage('logo', files)} />
                 </Form.Field>
 
-                {hasDefaultPic ? <Fragment>
-                      <Form.Group inline>
-                        <label>Picture</label>
-                        <Form.Field>
-                          <Checkbox toggle label="Use default picture" checked={this.state.use_default_pic} onChange={(e, data) => {
-                            this.setState({
-                              use_default_pic: data.checked,
-                              pic: data.checked ? undefined : this.state.pic,
-                            });
-                          }} />
-                        </Form.Field>
-                      </Form.Group>
-                      <Form.Field>
-                        <Dimmer.Dimmable as={Segment} dimmed={this.state.use_default_pic}>
-                          <Dimmer inverted active={this.state.use_default_pic} />
-                          {picSelectFragment}
-                        </Dimmer.Dimmable>
-                      </Form.Field>
-                    </Fragment>
-                    :
-                    <Form.Field>
-                      <label>Picture</label>
-                      {picSelectFragment}
-                    </Form.Field>
-                }
+                <Form.Group inline>
+                  <label>Picture</label>
+                  <Form.Field>
+                    <Checkbox toggle label="Use default picture" checked={this.state.use_default_pic} onChange={(e, data) => {
+                      this.setState({
+                        use_default_pic: data.checked,
+                        picture: data.checked ? undefined : this.state.picture,
+                      });
+                    }} />
+                  </Form.Field>
+                </Form.Group>
+                <Form.Field>
+                  <Dimmer.Dimmable dimmed={this.state.use_default_pic}>
+                    <Dimmer inverted active={this.state.use_default_pic} />
+                    <ImageSelectFormField disabled={this.state.use_default_pic}
+                                          value={this.state.picture} clear={() => this.setState({picture: undefined})}
+                                          setImage={(files) => this.setImage('picture', files)} />
+                  </Dimmer.Dimmable>
+                </Form.Field>
 
                 <Form.Field>
                   <label>Font</label>

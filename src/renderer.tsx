@@ -1,6 +1,7 @@
 import {Component, createRef, Fragment, ReactNode, RefObject, SVGProps} from "react";
 import * as PDFKit from "pdfkit";
 import {fetchFontTtf} from "./fonts";
+import ImageOption = PDFKit.Mixins.ImageOption;
 
 export interface RenderElement {
     renderToReact(): ReactNode;
@@ -249,6 +250,7 @@ export interface ImageElementOptions {
     height: number;
     horizontalAlign?: 'center' | 'left' | 'right';
     verticalAlign?: 'center' | 'top' | 'bottom';
+    scaleStrategy?: 'fit' | 'fill'
 
     bgFill?: string
     bgPadding?: number;
@@ -287,7 +289,11 @@ export class ImageElement implements RenderElement {
         } else {
             alignment += 'YMid';
         }
-        alignment += ' meet';
+        if (this.options.scaleStrategy === 'fill') {
+            alignment += ' slice';
+        } else {
+            alignment += ' meet';
+        }
 
         let img = <image
             key={this.key}
@@ -328,30 +334,59 @@ export class ImageElement implements RenderElement {
         let img = new Image(this.options.width, this.options.height);
         let promise = new Promise<void>((resolve, reject) => {
             img.onload = () => {
-                let scale = Math.min(this.options.width / img.naturalWidth, this.options.height / img.naturalHeight);
-                let width = scale * img.naturalWidth;
-                let height = scale * img.naturalHeight;
+                if (this.options.scaleStrategy === 'fill') {
+                    let scale = Math.max(this.options.width / img.naturalWidth, this.options.height / img.naturalHeight);
+                    let width = scale * img.naturalWidth;
+                    let height = scale * img.naturalHeight;
 
-                let x: number, y: number;
-                let horizontalAlignment = this.options.horizontalAlign || 'center';
-                if (horizontalAlignment === 'left') {
-                    x = this.options.x;
-                } else if (horizontalAlignment === 'right') {
-                    x = this.options.x + this.options.width - width;
+                    let srcX: number, srcY: number;
+                    let horizontalAlignment = this.options.horizontalAlign || 'center';
+                    if (horizontalAlignment === 'left') {
+                        srcX = 0;
+                    } else if (horizontalAlignment === 'right') {
+                        srcX = width - this.options.width;
+                    } else {
+                        srcX = (width - this.options.width)/2;
+                    }
+
+                    let verticalAlignment = this.options.verticalAlign || 'center';
+                    if (verticalAlignment === 'top') {
+                        srcY = 0;
+                    } else if (verticalAlignment === 'bottom') {
+                        srcY = height - this.options.height;
+                    } else {
+                        srcY = (height - this.options.height)/2;
+                    }
+
+                    ctx.drawImage(img, srcX/scale, srcY/scale, this.options.width/scale, this.options.height/scale,
+                            this.options.x, this.options.y, this.options.width, this.options.height);
+
                 } else {
-                    x = this.options.x + (this.options.width - width)/2;
-                }
+                    let scale = Math.min(this.options.width / img.naturalWidth, this.options.height / img.naturalHeight);
+                    let width = scale * img.naturalWidth;
+                    let height = scale * img.naturalHeight;
 
-                let verticalAlignment = this.options.verticalAlign || 'center';
-                if (verticalAlignment === 'top') {
-                    y = this.options.y;
-                } else if (verticalAlignment === 'bottom') {
-                    y = this.options.y + this.options.height - height;
-                } else {
-                    y = this.options.y + (this.options.height - height)/2;
-                }
+                    let x: number, y: number;
+                    let horizontalAlignment = this.options.horizontalAlign || 'center';
+                    if (horizontalAlignment === 'left') {
+                        x = this.options.x;
+                    } else if (horizontalAlignment === 'right') {
+                        x = this.options.x + this.options.width - width;
+                    } else {
+                        x = this.options.x + (this.options.width - width) / 2;
+                    }
 
-                ctx.drawImage(img, x, y, width, height);
+                    let verticalAlignment = this.options.verticalAlign || 'center';
+                    if (verticalAlignment === 'top') {
+                        y = this.options.y;
+                    } else if (verticalAlignment === 'bottom') {
+                        y = this.options.y + this.options.height - height;
+                    } else {
+                        y = this.options.y + (this.options.height - height) / 2;
+                    }
+
+                    ctx.drawImage(img, x, y, width, height);
+                }
                 resolve();
             };
             img.onerror = () => {
@@ -402,11 +437,16 @@ export class ImageElement implements RenderElement {
         }
 
         return dataUrlPromise.then(dataurl => {
-            doc.image(dataurl, this.options.x, this.options.y, {
-                fit: [this.options.width, this.options.height],
+            let options: ImageOption = {
                 align: align,
                 valign: valign,
-            });
+            };
+            if (this.options.scaleStrategy === 'fill') {
+                options.cover = [this.options.width, this.options.height];
+            } else {
+                options.fit = [this.options.width, this.options.height];
+            }
+            doc.image(dataurl, this.options.x, this.options.y, options);
         });
     }
 }

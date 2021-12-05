@@ -41,6 +41,13 @@ export interface ImageSpec {
     verticalAlignment?: 'center' | 'top' | 'bottom'
     // Defaults to false
     includeBackgroundFill?: boolean
+    // When scaling, should the image be filled to fit entirely within the rectangle ("fit") so that no cropping is
+    // needed but there may be extra transparent space, or should it be scaled to completely fill the rectangle ("fill")
+    // potentially cropping some of the image. Default is "fit".
+    scaleStrategy?: 'fit' | 'fill'
+    // For user-submitted images, should the image-cropping dialogue enforce the aspect ratio width/height? If so, the
+    // scaleStrategy above is irrelevant since fit and fill will have the same result. This defaults to false.
+    enforceAspectRatio?: boolean
 }
 
 export interface TextSpec {

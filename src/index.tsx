@@ -6,7 +6,6 @@ import {TemplateForm} from "./template_form";
 import {DEMO_CAMPAIGN} from "./demo";
 import {Campaign} from "./model";
 import {HEALTHY_CAMPAIGN} from "./healthy_campaign";
-import {FRAME_CAMPAIGN} from "./frame_campaign";
 
 class Demo extends Component<{campaign: Campaign}, {}> {
     constructor(props: {campaign: Campaign}) {
@@ -47,9 +46,6 @@ switch (campaignName) {
         break;
     case 'healthy':
         campaign = HEALTHY_CAMPAIGN;
-        break;
-    case 'frame':
-        campaign = FRAME_CAMPAIGN;
         break;
     default:
         campaign = DEMO_CAMPAIGN;
