@@ -1,0 +1,32 @@
+name: Deploy Demo
+on:
+  push:
+    branches:
+      - main
+jobs:
+  Deploy_Github_Demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "githubactionsbot@example.com"
+      - run: |
+          GITREV=$(git rev-parse --short HEAD)
+          npm install
+          npm run build
+          pushd bingo
+          npm install
+          npm run build
+          popd
+          git checkout --orphan gh-pages
+          git rm -r --cached .
+          rm -f .gitignore bingo/.gitignore
+          git add dist/ index.html blob-stream.js images/ healthy/
+          git add bingo/dist/ bingo/index.html bingo/images/
+          git commit -m "Github Pages Build (${GITREV})"
+          git push --force -u origin gh-pages
+
