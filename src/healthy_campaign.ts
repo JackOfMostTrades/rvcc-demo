@@ -236,10 +236,10 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 scaleStrategy: 'fill',
             },
             picture: {
-                x: 215,
-                y: 96,
-                width: 658,
-                height: 760,
+                x: 284,
+                y: 291,
+                width: 517,
+                height: 598,
                 enforceAspectRatio: true,
             },
             logo: {
