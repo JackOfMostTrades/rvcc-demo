@@ -216,15 +216,17 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 verticalAlignment: 'top',
             },
             defaultPicture: {
+                assetPath: '{background}_defaultpicture_square.png',
                 x: 16,
                 y: 16,
                 width: 1048,
                 height: 992,
                 horizontalAlignment: 'center',
-                verticalAlignment: 'center',
+                verticalAlignment: 'bottom',
                 scaleStrategy: 'fill',
             },
             antiDefaultPicture: {
+                assetPath: '{background}_frame_square.png',
                 x: 16,
                 y: 16,
                 width: 1048,

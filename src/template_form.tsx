@@ -216,18 +216,18 @@ export class TemplateForm extends Component<Props, State> {
           {x: 0, y: 0, width: size.width, height: size.height}));
     }
     if (size.defaultPicture && this.state.use_default_pic) {
-      let pattern = campaign.assetPaths?.defaultPicture || "{background}_defaultpicture_{language}.png";
+      let pattern = size.defaultPicture.assetPath || campaign.assetPaths?.defaultPicture || "{background}_defaultpicture_{language}.png";
       children.push(this.toImageElement("defaultPicture", size.defaultPicture, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.picture && this.state.picture) {
       children.push(this.toImageElement("picture", size.picture, this.state.picture));
     }
     if (size.antiDefaultPicture && !this.state.use_default_pic) {
-      let pattern = campaign.assetPaths?.antiDefaultPicture || "{background}_antidefaultpicture_{language}.png";
+      let pattern = size.antiDefaultPicture.assetPath || campaign.assetPaths?.antiDefaultPicture || "{background}_antidefaultpicture_{language}.png";
       children.push(this.toImageElement("antiDefaultPicture", size.antiDefaultPicture, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.header) {
-      let pattern = campaign.assetPaths?.header || "{background}_header_{language}.png";
+      let pattern = size.header.assetPath || campaign.assetPaths?.header || "{background}_header_{language}.png";
       children.push(this.toImageElement("header", size.header, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.logo && this.state.logo) {
@@ -240,7 +240,7 @@ export class TemplateForm extends Component<Props, State> {
       children.push(this.toTextElement("program_info", size.programInfo, this.state.program_info));
     }
     if (size.foreground) {
-      let pattern = campaign.assetPaths?.foreground || "{background}_foreground.png";
+      let pattern = size.foreground.assetPath || campaign.assetPaths?.foreground || "{background}_foreground.png";
       children.push(this.toImageElement("foreground", size.foreground, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     return children;

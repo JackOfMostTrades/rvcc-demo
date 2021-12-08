@@ -35,6 +35,8 @@ export interface ImageSpec {
     width: number
     height: number
 
+    // If specified, use this asset path instead of the one define in Campaign.assetPaths, (or instead of the default)
+    assetPath?: string
     // Defaults to "center"
     horizontalAlignment?: 'center' | 'left' | 'right'
     // Defaults to "center"
