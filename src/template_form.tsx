@@ -222,13 +222,13 @@ export class TemplateForm extends Component<Props, State> {
     if (size.picture && this.state.picture) {
       children.push(this.toImageElement("picture", size.picture, this.state.picture));
     }
-    if (size.header) {
-      let pattern = campaign.assetPaths?.header || "{background}_header_{language}.png";
-      children.push(this.toImageElement("header", size.header, campaign.assetPath + "/" + format(pattern, templateOptions)));
-    }
     if (size.antiDefaultPicture && !this.state.use_default_pic) {
       let pattern = campaign.assetPaths?.antiDefaultPicture || "{background}_antidefaultpicture_{language}.png";
       children.push(this.toImageElement("antiDefaultPicture", size.antiDefaultPicture, campaign.assetPath + "/" + format(pattern, templateOptions)));
+    }
+    if (size.header) {
+      let pattern = campaign.assetPaths?.header || "{background}_header_{language}.png";
+      children.push(this.toImageElement("header", size.header, campaign.assetPath + "/" + format(pattern, templateOptions)));
     }
     if (size.logo && this.state.logo) {
       children.push(this.toImageElement("logo", size.logo, this.state.logo));
