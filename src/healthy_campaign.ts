@@ -221,7 +221,7 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 width: 1048,
                 height: 992,
                 horizontalAlignment: 'center',
-                verticalAlignment: 'bottom',
+                verticalAlignment: 'center',
                 scaleStrategy: 'fill',
             },
             antiDefaultPicture: {
