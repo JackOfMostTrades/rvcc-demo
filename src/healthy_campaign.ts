@@ -236,9 +236,9 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 scaleStrategy: 'fill',
             },
             picture: {
-                x: 284,
-                y: 291,
-                width: 517,
+                x: 272,
+                y: 315,
+                width: 537,
                 height: 598,
                 enforceAspectRatio: true,
             },
