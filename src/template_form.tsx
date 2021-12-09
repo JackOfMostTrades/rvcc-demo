@@ -30,12 +30,13 @@ interface State {
   size?: number
   language?: number
   website?: string
+  website_font_size?: number
   program_info?: string
+  program_info_font_size?: number
   logo?: string
   use_default_pic?: boolean
   picture?: string
   font?: string
-  fontSize?: number
   fontColor?: string
 
   cropModalHref?: string
@@ -65,10 +66,11 @@ export class TemplateForm extends Component<Props, State> {
       size: 0,
       language: 0,
       website: "",
+      website_font_size: 55,
       program_info: "",
+      program_info_font_size: 55,
       use_default_pic: true,
       font: 'Quicksand',
-      fontSize: 55,
       fontColor: "#000000",
     };
     this.setImage = this.setImage.bind(this);
@@ -80,12 +82,13 @@ export class TemplateForm extends Component<Props, State> {
       size: 0,
       language: 0,
       website: "",
+      website_font_size: 55,
       program_info: "",
+      program_info_font_size: 55,
       logo: undefined,
       picture: undefined,
       use_default_pic: true,
       font: 'Quicksand',
-      fontSize: 55,
       fontColor: '#000000',
       cropModalHref: undefined,
       cropModalCallback: undefined,
@@ -179,7 +182,10 @@ export class TemplateForm extends Component<Props, State> {
     });
   }
 
-  private toTextElement(key: string, spec: TextSpec|undefined, text: string|undefined): TextElement|undefined {
+  private toTextElement(key: string,
+                        spec: TextSpec|undefined,
+                        options: {fontSize?: number},
+                        text: string|undefined): TextElement|undefined {
     if (!spec || !text) {
       return undefined;
     }
@@ -187,7 +193,7 @@ export class TemplateForm extends Component<Props, State> {
     return new TextElement(key, text, {
       x: spec.x,
       y: spec.y,
-      fontSize: this.state.fontSize,
+      fontSize: options.fontSize,
       color: this.state.fontColor,
       fontFamily: this.state.font + ', sans-serif',
       horizontalAlign: spec.horizontalAlignment,
@@ -234,10 +240,10 @@ export class TemplateForm extends Component<Props, State> {
       children.push(this.toImageElement("logo", size.logo, this.state.logo));
     }
     if (size.website && this.state.website) {
-      children.push(this.toTextElement("website", size.website, this.state.website));
+      children.push(this.toTextElement("website", size.website, {fontSize: this.state.website_font_size}, this.state.website));
     }
     if (size.programInfo && this.state.program_info) {
-      children.push(this.toTextElement("program_info", size.programInfo, this.state.program_info));
+      children.push(this.toTextElement("program_info", size.programInfo, {fontSize: this.state.program_info_font_size}, this.state.program_info));
     }
     if (size.foreground) {
       let pattern = size.foreground.assetPath || campaign.assetPaths?.foreground || "{background}_foreground.png";
@@ -279,21 +285,35 @@ export class TemplateForm extends Component<Props, State> {
                             onChange={(e, data) => this.setState({language: data.value as number})} />
                   </Form.Field>
                 </Form.Group>
-                <Form.Field>
-                  <label>Website / Social Media</label>
-                  <Input value={this.state.website} onChange={e => this.setState({website: e.target.value})} />
-                </Form.Field>
-                <Form.Field>
-                  <label>Program Information</label>
-                  <TextArea rows={2} style={{resize: 'none'}} value={this.state.program_info} onChange={e => {
-                    let val = e.target.value;
-                    // Enforce maximum of two lines
-                    if (val.split('\n').length > 2) {
-                      return;
-                    }
-                    this.setState({program_info: val});
-                  }} />
-                </Form.Field>
+                <Form.Group widths={16}>
+                  <Form.Field width={12}>
+                    <label>Website / Social Media</label>
+                    <Input value={this.state.website} onChange={e => this.setState({website: e.target.value})} />
+                  </Form.Field>
+                  <Form.Field width={4}>
+                    <label>Font Size</label>
+                    <Input type="number" value={this.state.website_font_size} onChange={e => this.setState({website_font_size: parseInt(e.target.value)})} />
+                  </Form.Field>
+                </Form.Group>
+
+                <Form.Group widths={16}>
+                  <Form.Field width={12}>
+                    <label>Program Information</label>
+                    <TextArea rows={2} style={{resize: 'none'}} value={this.state.program_info} onChange={e => {
+                      let val = e.target.value;
+                      // Enforce maximum of two lines
+                      if (val.split('\n').length > 2) {
+                        return;
+                      }
+                      this.setState({program_info: val});
+                    }} />
+                  </Form.Field>
+                  <Form.Field width={4}>
+                    <label>Font Size</label>
+                    <Input type="number" value={this.state.program_info_font_size} onChange={e => this.setState({program_info_font_size: parseInt(e.target.value)})} />
+                  </Form.Field>
+                </Form.Group>
+
                 <Form.Field>
                   <label>Logo</label>
                   <ImageSelectFormField value={this.state.logo}
@@ -321,16 +341,12 @@ export class TemplateForm extends Component<Props, State> {
                   </Dimmer.Dimmable>
                 </Form.Field>
 
-                <Form.Field>
-                  <label>Font</label>
-                  <Select options={FONTS.map(f => {return {key: f, label: <label style={{fontFamily: f}}>{f}</label>, value: f}})}
-                          value={this.state.font} text={this.state.font}
-                          onChange={(e, data) => this.setState({font: data.value as string})} />
-                </Form.Field>
                 <Form.Group widths="equal">
                   <Form.Field>
-                    <label>Font Size</label>
-                    <Input type="number" value={this.state.fontSize} onChange={e => this.setState({fontSize: parseInt(e.target.value)})} />
+                    <label>Font</label>
+                    <Select options={FONTS.map(f => {return {key: f, label: <label style={{fontFamily: f}}>{f}</label>, value: f}})}
+                            value={this.state.font} text={this.state.font}
+                            onChange={(e, data) => this.setState({font: data.value as string})} />
                   </Form.Field>
                   <Form.Field>
                     <label>Font Color</label>
