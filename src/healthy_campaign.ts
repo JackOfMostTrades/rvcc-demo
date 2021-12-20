@@ -208,10 +208,10 @@ export const HEALTHY_CAMPAIGN: Campaign = {
             width: 1080,
             height: 1080,
             header: {
-                x: 0,
+                x: 16,
                 y: 52,
-                width: 1080,
-                height: 1028,
+                width: 1048,
+                height: 200,
                 horizontalAlignment: 'center',
                 verticalAlignment: 'top',
             },
@@ -237,7 +237,7 @@ export const HEALTHY_CAMPAIGN: Campaign = {
             },
             picture: {
                 x: 272,
-                y: 315,
+                y: 353,
                 width: 537,
                 height: 598,
                 enforceAspectRatio: true,

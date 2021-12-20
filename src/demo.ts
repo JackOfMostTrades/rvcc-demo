@@ -9,6 +9,7 @@ export const DEMO_CAMPAIGN: Campaign = {
         antiDefaultPicture: "{background}_antidefaultpicture_{language}.png",
     },
     languages: ["English", "Spanish"],
+    suggestTransparentPictures: true,
     backgrounds: [
         {name: "Boundaries", color: "#ffbd59"},
         {name: "Experience", color: "#9d7bd9"},

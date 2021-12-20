@@ -76,6 +76,7 @@ export interface Campaign {
         defaultPicture?: string
         antiDefaultPicture?: string
     }
+    suggestTransparentPictures?: boolean
     backgrounds: BackgroundSpec[]
     sizes: SizeSpec[]
     languages: string[]

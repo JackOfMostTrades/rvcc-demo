@@ -1,9 +1,8 @@
-import {Component, Fragment, ReactNode} from 'react';
+import {Component, ReactNode} from 'react';
 import {
   Button,
   Checkbox,
   Container,
-  Dimmer,
   Form,
   Grid,
   Header,
@@ -314,13 +313,6 @@ export class TemplateForm extends Component<Props, State> {
                   </Form.Field>
                 </Form.Group>
 
-                <Form.Field>
-                  <label>Logo</label>
-                  <ImageSelectFormField value={this.state.logo}
-                                        clear={() => this.setState({logo: undefined})}
-                                        setImage={(files) => this.setImage('logo', files)} />
-                </Form.Field>
-
                 <Form.Group inline>
                   <label>Picture</label>
                   <Form.Field>
@@ -332,13 +324,21 @@ export class TemplateForm extends Component<Props, State> {
                     }} />
                   </Form.Field>
                 </Form.Group>
+
+                {this.state.use_default_pic ? null : <Form.Field>
+                  <ImageSelectFormField disabled={this.state.use_default_pic}
+                                        value={this.state.picture} clear={() => this.setState({picture: undefined})}
+                                        setImage={(files) => this.setImage('picture', files)} />
+                  {this.props.campaign.suggestTransparentPictures ?
+                      <p>We recommend using an image with a transparent background. Consider using <a href="https://www.adobe.com/express/feature/image/remove-background">this free tool</a> if you need to remove the background from an image.</p>
+                      : null }
+                </Form.Field>}
+
                 <Form.Field>
-                  <Dimmer.Dimmable dimmed={this.state.use_default_pic}>
-                    <Dimmer inverted active={this.state.use_default_pic} />
-                    <ImageSelectFormField disabled={this.state.use_default_pic}
-                                          value={this.state.picture} clear={() => this.setState({picture: undefined})}
-                                          setImage={(files) => this.setImage('picture', files)} />
-                  </Dimmer.Dimmable>
+                  <label>Logo</label>
+                  <ImageSelectFormField value={this.state.logo}
+                                        clear={() => this.setState({logo: undefined})}
+                                        setImage={(files) => this.setImage('logo', files)} />
                 </Form.Field>
 
                 <Form.Group widths="equal">
