@@ -208,6 +208,7 @@ export const HEALTHY_CAMPAIGN: Campaign = {
             width: 1080,
             height: 1080,
             header: {
+                assetPath: '{background}_header_{language}_square.png',
                 x: 16,
                 y: 52,
                 width: 1048,
