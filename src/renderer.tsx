@@ -59,14 +59,16 @@ export class TextContainer implements RenderElement {
         return {width: bbox.width, height: bbox.height};
     }
 
-    renderToReact(): React.ReactNode {
+    renderGeneric(getExtents: (line: TextContainerLine) => {width: number, height: number},
+                  drawRect: (color: string|undefined, x: number, y: number, width: number, height: number) => void,
+                  drawText: (text: string, x: number, y: number, fontSize: number, color: string|undefined, fontFamily: string, horizontalAlign: 'right'|'center'|'left'|undefined) => void) {
         if (this.lines.length === 0) {
-            return [];
+            return;
         }
 
         let bboxes: Array<{width: number, height: number}> = [];
         for (let i = 0; i < this.lines.length; i++) {
-            bboxes[i] = this.computeBbox(this.lines[i]);
+            bboxes[i] = getExtents(this.lines[i]);
         }
         let maxWidth = 0;
         let totalHeight = 0;
@@ -88,204 +90,129 @@ export class TextContainer implements RenderElement {
             y -= totalHeight/2;
         }
 
-        let nodes: Array<React.ReactNode> = [];
         if (this.options.bgFill) {
             let padding = this.options.bgPadding || 0;
-            nodes.push(<rect fill={this.options.bgFill} x={x-padding} y={y-padding} width={maxWidth + 2*padding} height={totalHeight + 2*padding} />);
+            drawRect(this.options.bgFill, x-padding, y-padding, maxWidth + 2*padding, totalHeight + 2*padding);
         }
 
-        let textAnchor = 'start';
-        if (this.options.horizontalAlign === 'right') {
-            textAnchor = 'end';
-        } else if (this.options.horizontalAlign === 'center') {
-            textAnchor = 'middle';
-        }
         for (let i = 0; i < this.lines.length; i++) {
             let line = this.lines[i];
             y += bboxes[i].height;
-            nodes.push(<text x={this.options.x} y={y} fontSize={line.fontSize} fill={line.color} fontFamily={line.fontFamily} textAnchor={textAnchor}>{line.text}</text>);
+            drawText(line.text, this.options.x, y, line.fontSize, line.color, line.fontFamily, this.options.horizontalAlign);
         }
+    }
+
+    renderToReact(): React.ReactNode {
+        let nodes: Array<React.ReactNode> = [];
+        this.renderGeneric(line => this.computeBbox(line),
+            (color, x, y, width, height) => nodes.push(
+                <rect fill={color} x={x} y={y} width={width} height={height}/>),
+            (text, x, y, fontSize, color, fontFamily, horizontalAlign1) => {
+                let textAnchor = 'start';
+                if (this.options.horizontalAlign === 'right') {
+                    textAnchor = 'end';
+                } else if (this.options.horizontalAlign === 'center') {
+                    textAnchor = 'middle';
+                }
+                nodes.push(<text x={x} y={y} fontSize={fontSize} fill={color} fontFamily={fontFamily} textAnchor={textAnchor}>{text}</text>);
+            });
         return nodes;
     }
 
     renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void> {
-        return Promise.resolve();
-    }
-
-    public renderToPdf(doc: PDFKit.PDFDocument): Promise<void> {
-        return Promise.resolve();
-    }
-}
-/*
-export class TextElement implements RenderElement {
-    private key: string
-    private text: string
-    private options: TextElementOptions;
-
-    constructor(key: string, text: string, options: TextElementOptions) {
-        this.key = key;
-        this.text = text;
-        this.options = options;
-    }
-
-    private getLinesToRender(): Array<TextElementLine> {
-        if (!this.text) {
-            return [];
-        }
-
-        let lines = this.text.split('\n');
-        let height = this.options.fontSize || 0;
-        let lineHeight = height * 1.0;
-        let firstY = this.options.y;
-        if (this.options.verticalAlign === 'top') {
-            // "top" means the 'y' coordinate should be the top of the line.
-            firstY += lineHeight;
-        } else if (this.options.verticalAlign === 'center') {
-            firstY += lineHeight/2;
-        }
-
-        if (this.options.lineDistribution === 'center') {
-            firstY -= lineHeight * (lines.length-1) / 2;
-        } else if (this.options.lineDistribution === 'up') {
-            firstY -= lineHeight * (lines.length-1);
-        }
-        let x = this.options.x;
-
-        let result: Array<TextElementLine> = [];
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
-            let y = firstY + lineHeight * i;
-            result.push({x: x, y: y, line: line});
-        }
-
-        return result;
-    }
-
-    renderToReact(): React.ReactNode {
-        if (!this.text) {
-            return null;
-        }
-
-        let textAnchor = 'start';
-        if (this.options.horizontalAlign === 'right') {
-            textAnchor = 'end';
-        } else if (this.options.horizontalAlign === 'center') {
-            textAnchor = 'middle';
-        }
-
-        let lines = this.getLinesToRender();
-        let nodes: Array<ReactNode> = [];
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
-            nodes.push(<BgSvgTextNode key={i} text={line.line} textProps={{
-                x: line.x,
-                y: line.y,
-                textAnchor: textAnchor,
-                fontSize: this.options.fontSize,
-                fill: this.options.color,
-                fontFamily: this.options.fontFamily,
-                dominantBaseline: 'bottom',
-            }} bgFill={this.options.bgFill} bgPadding={this.options.bgPadding}/>);
-        }
-
-        return <Fragment key={this.key} children={nodes} />;
-    }
-
-    renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void> {
-        if (!this.text) {
-            return Promise.resolve();
-        }
-
-        ctx.textAlign = this.options.horizontalAlign || 'left';
-
-        let font: string = '';
-        if (this.options.fontSize) {
-            font += this.options.fontSize + 'px ';
-        }
-        if (this.options.fontFamily) {
-            font += this.options.fontFamily;
-        }
-        if (font) {
-            ctx.font = font;
-        }
-
-        let lines = this.getLinesToRender();
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
-
-            if (this.options.bgFill) {
-                let metrics = ctx.measureText(line.line);
-                let rectX = line.x - metrics.actualBoundingBoxLeft;
-                let width = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
-                let height = this.options.fontSize || 0;
-                let padding = this.options.bgPadding || 0;
-
-                ctx.fillStyle = this.options.bgFill;
-                ctx.fillRect(rectX - padding, line.y - height - padding, width + 2*padding, height + 2*padding);
+        ctx.textBaseline = 'bottom';
+        let setFontOnCtx = (fontSize: number|undefined, fontFamily: string|undefined) => {
+            let font: string = '';
+            if (fontSize) {
+                font += fontSize + 'px ';
             }
-
-            if (this.options.color) {
-                ctx.fillStyle = this.options.color;
+            if (fontFamily) {
+                font += fontFamily;
+            }
+            if (font) {
+                ctx.font = font;
+            }
+        };
+        let getExtents = (line: TextContainerLine) => {
+            setFontOnCtx(line.fontSize, line.fontFamily);
+            let metrics = ctx.measureText(line.text);
+            return {width: Math.max(0, metrics.actualBoundingBoxLeft) + Math.max(0, metrics.actualBoundingBoxRight),
+                height: Math.max(0, metrics.actualBoundingBoxAscent) + Math.max(0, metrics.actualBoundingBoxDescent)};
+        };
+        let drawRect = (color: string|undefined, x: number, y: number, width: number, height: number) => {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+        };
+        let drawText = (text: string, x: number, y: number, fontSize: number, color: string|undefined, fontFamily: string, horizontalAlign: 'right'|'center'|'left'|undefined) => {
+            setFontOnCtx(fontSize, fontFamily);
+            ctx.textAlign = horizontalAlign || 'left';
+            if (color) {
+                ctx.fillStyle = color;
             } else {
                 ctx.fillStyle = 'black';
             }
-            ctx.fillText(line.line, line.x, line.y);
-        }
+            ctx.fillText(text, x, y);
+        };
+
+        this.renderGeneric(getExtents, drawRect, drawText);
         return Promise.resolve();
     }
 
     public renderToPdf(doc: PDFKit.PDFDocument): Promise<void> {
-        if (!this.text) {
-            return Promise.resolve();
+        let options: PDFKit.Mixins.TextOptions = {
+            lineBreak: false,
+            baseline: 'bottom',
         }
 
-        if (this.options.fontFamily.indexOf(',') === -1) {
-            return Promise.reject("Unsupported font family: " + this.options.fontFamily);
+        let getFontNameFromFamily = (fontFamily: string|undefined): string => {
+            if (fontFamily.indexOf(',') === -1) {
+                return fontFamily;
+            }
+            return fontFamily.substring(0, fontFamily.indexOf(','));
         }
-        let font = this.options.fontFamily.substring(0, this.options.fontFamily.indexOf(','));
+        let setFontOnDoc = (fontSize: number|undefined, fontFamily: string|undefined) => {
+            let font = getFontNameFromFamily(fontFamily);
+            doc.font(fontFamily);
+            if (fontSize) {
+                doc.fontSize(fontSize);
+            }
+        };
+        let getExtents = (line: TextContainerLine) => {
+            setFontOnDoc(line.fontSize, line.fontFamily);
+            let width = doc.widthOfString(line.text, options);
+            let height = doc.heightOfString(line.text, options);
+            return {width: width, height: height};
+        };
+        let drawRect = (color: string|undefined, x: number, y: number, width: number, height: number) => {
+            doc.rect(x, y, width, height);
+            doc.fill(color);
+        };
+        let drawText = (text: string, x: number, y: number, fontSize: number, color: string|undefined, fontFamily: string, horizontalAlign: 'right'|'center'|'left'|undefined) => {
+            setFontOnDoc(fontSize, fontFamily);
 
-        return fetchFontTtf(font)
-            .then((fontArrayBuffer) => {
-                doc.registerFont(font, fontArrayBuffer)
-                doc.font(font);
-                if (this.options.fontSize) {
-                    doc.fontSize(this.options.fontSize);
-                }
+            let width = doc.widthOfString(text, options);
+            if (this.options.horizontalAlign === 'center') {
+                x -= width/2;
+            } else if (this.options.horizontalAlign === 'right') {
+                x -= width;
+            }
 
-                let options: PDFKit.Mixins.TextOptions = {
-                    lineBreak: false,
-                    baseline: 'bottom',
-                }
+            doc.fillColor(color || 'black');
+            doc.strokeColor(color || 'black');
+            doc.text(text, x, y, options);
+        };
 
-                let lines = this.getLinesToRender();
-                for (let i = 0; i < lines.length; i++) {
-                    let line = lines[i];
-                    let width = doc.widthOfString(line.line, options);
+        let promise: Promise<void> = Promise.resolve();
+        this.lines.forEach(line => {
+            let font = getFontNameFromFamily(line.fontFamily);
+            promise = promise.then(() => fetchFontTtf(font).then((fontArrayBuffer) => {doc.registerFont(font, fontArrayBuffer);}));
+        });
 
-                    let x = line.x
-                    if (this.options.horizontalAlign === 'center') {
-                        x -= width/2;
-                    } else if (this.options.horizontalAlign === 'right') {
-                        x -= width;
-                    }
-
-                    if (this.options.bgFill) {
-                        let padding = this.options.bgPadding || 0;
-                        let height = this.options.fontSize || 0;
-                        doc.rect(x - padding, line.y-height-padding, width+2*padding, height+2*padding);
-                        doc.fill(this.options.bgFill);
-                    }
-
-                    doc.fillColor(this.options.color || 'black');
-                    doc.strokeColor(this.options.color || 'black');
-                    doc.text(line.line, x, line.y, options);
-                }
-
-                return Promise.resolve();
-            });
+        return promise.then(() => {
+            this.renderGeneric(getExtents, drawRect, drawText);
+        })
     }
 }
- */
 
 export interface ImageElementOptions {
     x: number;
