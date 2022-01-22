@@ -13,11 +13,20 @@ import {
   Select,
   TextArea
 } from "semantic-ui-react";
-import {CanvasRenderer, ImageElement, PdfRenderer, ReactRenderer, RenderElement, TextElement} from "./renderer";
+import {
+  CanvasRenderer,
+  ImageElement,
+  PdfRenderer,
+  ReactRenderer,
+  RenderElement,
+  TextContainer,
+  TextContainerLine
+} from "./renderer";
 import {CropBox} from "./cropbox";
 import {FONTS} from "./fonts";
 import {Campaign, ImageSpec, TextSpec} from "./model";
 import ColorPicker from "./color_picker";
+
 const format = require("string-template");
 
 export interface Props {
@@ -184,22 +193,18 @@ export class TemplateForm extends Component<Props, State> {
   private toTextElement(key: string,
                         spec: TextSpec|undefined,
                         options: {fontSize?: number},
-                        text: string|undefined): TextElement|undefined {
-    if (!spec || !text) {
+                        lines: Array<TextContainerLine>): TextContainer|undefined {
+    if (!spec || lines.length === 0) {
       return undefined;
     }
     let background = this.props.campaign.backgrounds[this.state.background];
-    return new TextElement(key, text, {
+    return new TextContainer(key, lines, {
       x: spec.x,
       y: spec.y,
-      fontSize: options.fontSize,
-      color: this.state.fontColor,
-      fontFamily: this.state.font + ', sans-serif',
       horizontalAlign: spec.horizontalAlignment,
-      verticalAlign: spec.verticalAlignment,
       lineDistribution: spec.lineDistribution,
       bgFill: spec.includeBackgroundFill ? background.color : undefined,
-      bgPadding: 5,
+      bgPadding: 10,
     });
   }
 
@@ -238,11 +243,31 @@ export class TemplateForm extends Component<Props, State> {
     if (size.logo && this.state.logo) {
       children.push(this.toImageElement("logo", size.logo, this.state.logo));
     }
-    if (size.website && this.state.website) {
-      children.push(this.toTextElement("website", size.website, {fontSize: this.state.website_font_size}, this.state.website));
+
+    let websiteLines: Array<TextContainerLine> = [];
+    if (!size.defaultPictureWebsiteDisabled || !this.state.use_default_pic) {
+      if (this.state.website) {
+        websiteLines.push({text: this.state.website, color: this.state.fontColor, fontSize: this.state.website_font_size, fontFamily: this.state.font});
+      }
+    }
+    if (this.state.use_default_pic && size.defaultPictureWebsiteExtraText) {
+      let fontSize = size.defaultPictureWebsiteExtraText.fontSize || this.state.website_font_size;
+      let extraText = size.defaultPictureWebsiteExtraText.text[language];
+      if (extraText) {
+        websiteLines.push({text: extraText, color: this.state.fontColor, fontSize: fontSize, fontFamily: this.state.font});
+      }
+    }
+    if (size.website && websiteLines.length > 0) {
+      children.push(this.toTextElement("website", size.website, {fontSize: this.state.website_font_size}, websiteLines));
     }
     if (size.programInfo && this.state.program_info) {
-      children.push(this.toTextElement("program_info", size.programInfo, {fontSize: this.state.program_info_font_size}, this.state.program_info));
+      let lines: Array<TextContainerLine> = [];
+      this.state.program_info.split("\n").forEach(line => {
+        if (line) {
+          lines.push({text: line, color: this.state.fontColor, fontSize: this.state.program_info_font_size, fontFamily: this.state.font});
+        }
+      });
+      children.push(this.toTextElement("program_info", size.programInfo, {fontSize: this.state.program_info_font_size}, lines));
     }
     if (size.foreground) {
       let pattern = size.foreground.assetPath || campaign.assetPaths?.foreground || "{background}_foreground.png";
@@ -257,6 +282,8 @@ export class TemplateForm extends Component<Props, State> {
   }
 
   render() {
+    let websiteInputDisabled = this.props.campaign.sizes[this.state.size].defaultPictureWebsiteDisabled && this.state.use_default_pic;
+
     return <Container>
       <Segment>
         <CropBox href={this.state.cropModalHref} onComplete={this.state.cropModalCallback} aspect={this.state.cropModalAspectRatio} />
@@ -287,11 +314,11 @@ export class TemplateForm extends Component<Props, State> {
                 <Form.Group widths={16}>
                   <Form.Field width={12}>
                     <label>Website / Social Media</label>
-                    <Input value={this.state.website} onChange={e => this.setState({website: e.target.value})} />
+                    <Input disabled={websiteInputDisabled} value={this.state.website} onChange={e => this.setState({website: e.target.value})} />
                   </Form.Field>
                   <Form.Field width={4}>
                     <label>Font Size</label>
-                    <Input type="number" value={this.state.website_font_size} onChange={e => this.setState({website_font_size: parseInt(e.target.value)})} />
+                    <Input disabled={websiteInputDisabled} type="number" value={this.state.website_font_size} onChange={e => this.setState({website_font_size: parseInt(e.target.value)})} />
                   </Form.Field>
                 </Form.Group>
 

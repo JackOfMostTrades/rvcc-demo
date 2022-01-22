@@ -3,7 +3,7 @@ import {Component, createElement} from "react";
 import {Container, Header} from "semantic-ui-react";
 import {FONTS} from "./fonts";
 import {TemplateForm} from "./template_form";
-import {DEMO_CAMPAIGN} from "./demo";
+import {SURVIVOR_CAMPAIGN} from "./survivor_campaign";
 import {Campaign} from "./model";
 import {HEALTHY_CAMPAIGN} from "./healthy_campaign";
 
@@ -42,13 +42,20 @@ let campaign: Campaign;
 let campaignName: string = new URLSearchParams(window.location.search).get('campaign') || 'demo';
 switch (campaignName) {
     case 'demo':
-        campaign = DEMO_CAMPAIGN;
+        campaign = SURVIVOR_CAMPAIGN;
         break;
     case 'healthy':
         campaign = HEALTHY_CAMPAIGN;
         break;
     default:
-        campaign = DEMO_CAMPAIGN;
+        campaign = SURVIVOR_CAMPAIGN;
         break;
 }
-render(createElement(Demo, {campaign: campaign}), document.getElementById('demo'));
+
+var loader = setInterval(() => {
+    if (document.readyState !== 'complete') {
+        return;
+    }
+    clearInterval(loader);
+    render(createElement(Demo, {campaign: campaign}), document.getElementById('demo'));
+});

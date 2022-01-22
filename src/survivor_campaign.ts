@@ -1,6 +1,6 @@
 import {Campaign} from "./model";
 
-export const DEMO_CAMPAIGN: Campaign = {
+export const SURVIVOR_CAMPAIGN: Campaign = {
     assetPath: "images",
     assetPaths: {
         background: "{background}_{size}.png",
@@ -73,15 +73,21 @@ export const DEMO_CAMPAIGN: Campaign = {
                 x: 1571,
                 y: 0,
                 horizontalAlignment: 'right',
-                verticalAlignment: 'top',
+                lineDistribution: 'down',
                 includeBackgroundFill: true,
             },
             programInfo: {
                 x: 698,
                 y: 1902,
                 horizontalAlignment: 'center',
-                verticalAlignment: 'center',
                 lineDistribution: 'center',
+            },
+            defaultPictureWebsiteExtraText: {
+                fontSize: 40,
+                text: {
+                    "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
+                    "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
+                },
             },
         },
         {
@@ -132,15 +138,22 @@ export const DEMO_CAMPAIGN: Campaign = {
                 x: 1080,
                 y: 0,
                 horizontalAlignment: 'right',
-                verticalAlignment: 'top',
+                lineDistribution: 'down',
                 includeBackgroundFill: true,
             },
             programInfo: {
                 x: 489,
                 y: 1019,
                 horizontalAlignment: 'center',
-                verticalAlignment: 'center',
                 lineDistribution: 'center',
+            },
+            defaultPictureWebsiteDisabled: true,
+            defaultPictureWebsiteExtraText: {
+                fontSize: 30,
+                text: {
+                    "english": "#iamasurvivorcampaign",
+                    "spanish": "#iamasurvivorcampaign",
+                },
             },
         },
         {
@@ -191,15 +204,21 @@ export const DEMO_CAMPAIGN: Campaign = {
                 x: 1545,
                 y: 0,
                 horizontalAlignment: 'right',
-                verticalAlignment: 'top',
+                lineDistribution: 'down',
                 includeBackgroundFill: true,
             },
             programInfo: {
                 x: 678,
                 y: 1896,
                 horizontalAlignment: 'center',
-                verticalAlignment: 'center',
                 lineDistribution: 'center',
+            },
+            defaultPictureWebsiteExtraText: {
+                fontSize: 40,
+                text: {
+                    "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
+                    "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
+                },
             },
         },
         {
@@ -250,15 +269,21 @@ export const DEMO_CAMPAIGN: Campaign = {
                 x: 1294,
                 y: 0,
                 horizontalAlignment: 'right',
-                verticalAlignment: 'top',
+                lineDistribution: 'down',
                 includeBackgroundFill: true,
             },
             programInfo: {
                 x: 553,
                 y: 1896,
                 horizontalAlignment: 'center',
-                verticalAlignment: 'center',
                 lineDistribution: 'center',
+            },
+            defaultPictureWebsiteExtraText: {
+                fontSize: 40,
+                text: {
+                    "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
+                    "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
+                },
             },
         },
         {
@@ -309,15 +334,21 @@ export const DEMO_CAMPAIGN: Campaign = {
                 x: 1333,
                 y: 0,
                 horizontalAlignment: 'right',
-                verticalAlignment: 'top',
+                lineDistribution: 'down',
                 includeBackgroundFill: true,
             },
             programInfo: {
                 x: 585,
                 y: 1909,
                 horizontalAlignment: 'center',
-                verticalAlignment: 'center',
                 lineDistribution: 'center',
+            },
+            defaultPictureWebsiteExtraText: {
+                fontSize: 40,
+                text: {
+                    "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
+                    "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
+                },
             },
         },
     ]

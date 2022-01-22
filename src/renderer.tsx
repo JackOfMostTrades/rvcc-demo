@@ -9,71 +9,114 @@ export interface RenderElement {
     renderToPdf(doc: PDFKit.PDFDocument): Promise<void>;
 }
 
-export interface TextElementOptions {
+export interface TextContainerOptions {
     x: number;
     y: number;
-    fontSize?: number;
-    color?: string,
-    fontFamily?: string;
     horizontalAlign?: 'left' | 'right' | 'center';
-    verticalAlign?: 'top' | 'bottom' | 'center';
     lineDistribution?: 'down' | 'up' | 'center';
     bgFill?: string;
     bgPadding?: number;
 }
 
-interface BgSvgTextNodeProps {
-    text: string;
-    textProps: SVGProps<SVGTextElement>;
-    bgFill?: string;
-    bgPadding?: number;
+export interface TextContainerLine {
+    text: string
+    fontSize?: number;
+    color?: string,
+    fontFamily?: string;
 }
 
-class BgSvgTextNode extends Component<BgSvgTextNodeProps, {extents?: DOMRect}> {
-    private ref: RefObject<SVGTextElement>;
+export class TextContainer implements RenderElement {
+    private key: string;
+    private lines: TextContainerLine[];
+    private options: TextContainerOptions;
 
-    constructor(props: BgSvgTextNodeProps) {
-        super(props);
-        this.ref = createRef();
-        this.state = {};
+    constructor(key: string, lines: TextContainerLine[], options: TextContainerOptions) {
+        this.key = key;
+        this.lines = lines;
+        this.options = options;
     }
 
-    componentDidMount() {
-        this.updateExtents();
+    private computeBbox(line: TextContainerLine): {width: number, height: number} {
+        let hiddenDiv = document.createElement('div');
+        hiddenDiv.style.opacity = '0';
+        document.body.appendChild(hiddenDiv);
+
+        let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', "0 0 200 200");
+        let textNode = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        textNode.setAttribute('x', '0');
+        textNode.setAttribute('y', '0');
+        textNode.setAttribute('font-size', '' + (line.fontSize || 0));
+        textNode.setAttribute('fill', line.color);
+        textNode.setAttribute('font-family', line.fontFamily);
+        textNode.appendChild(document.createTextNode(line.text));
+        svg.appendChild(textNode);
+        hiddenDiv.appendChild(svg);
+
+        let bbox = textNode.getBBox();
+        document.body.removeChild(hiddenDiv);
+
+        return {width: bbox.width, height: bbox.height};
     }
 
-    componentDidUpdate(prevProps: BgSvgTextNodeProps) {
-        if (prevProps.text !== this.props.text
-                || prevProps.textProps.x !== this.props.textProps.x
-                || prevProps.textProps.y !== this.props.textProps.y
-                || prevProps.textProps.fontFamily !== this.props.textProps.fontFamily
-                || prevProps.textProps.fontSize !== this.props.textProps.fontSize) {
-            this.updateExtents();
+    renderToReact(): React.ReactNode {
+        if (this.lines.length === 0) {
+            return [];
         }
-    }
 
-    private updateExtents() {
-        this.setState({extents: this.ref.current.getBBox()});
-    }
-
-    render() {
-        const margin = this.props.bgPadding || 0;
-        const extents = this.state.extents;
-
-        let outline: ReactNode;
-        if (this.props.bgFill && extents) {
-            outline = <rect fill={this.props.bgFill} x={extents.x - margin} y = {extents.y - margin } width={extents.width + 2 * margin} height={extents.height + 2 * margin} />;
+        let bboxes: Array<{width: number, height: number}> = [];
+        for (let i = 0; i < this.lines.length; i++) {
+            bboxes[i] = this.computeBbox(this.lines[i]);
         }
-        return <Fragment>{outline}<text ref={this.ref} {...this.props.textProps}>{this.props.text}</text></Fragment>;
+        let maxWidth = 0;
+        let totalHeight = 0;
+        for (let i = 0; i < bboxes.length; i++) {
+            maxWidth = Math.max(maxWidth, bboxes[i].width);
+            totalHeight += bboxes[i].height;
+        }
+
+        let x = this.options.x;
+        let y = this.options.y;
+        if (this.options.horizontalAlign === 'right') {
+            x -= maxWidth;
+        } else if (this.options.horizontalAlign === 'center') {
+            x -= maxWidth/2;
+        }
+        if (this.options.lineDistribution === 'up') {
+            y -= totalHeight;
+        } else if (this.options.lineDistribution === 'center') {
+            y -= totalHeight/2;
+        }
+
+        let nodes: Array<React.ReactNode> = [];
+        if (this.options.bgFill) {
+            let padding = this.options.bgPadding || 0;
+            nodes.push(<rect fill={this.options.bgFill} x={x-padding} y={y-padding} width={maxWidth + 2*padding} height={totalHeight + 2*padding} />);
+        }
+
+        let textAnchor = 'start';
+        if (this.options.horizontalAlign === 'right') {
+            textAnchor = 'end';
+        } else if (this.options.horizontalAlign === 'center') {
+            textAnchor = 'middle';
+        }
+        for (let i = 0; i < this.lines.length; i++) {
+            let line = this.lines[i];
+            y += bboxes[i].height;
+            nodes.push(<text x={this.options.x} y={y} fontSize={line.fontSize} fill={line.color} fontFamily={line.fontFamily} textAnchor={textAnchor}>{line.text}</text>);
+        }
+        return nodes;
+    }
+
+    renderToCanvas(ctx: CanvasRenderingContext2D): Promise<void> {
+        return Promise.resolve();
+    }
+
+    public renderToPdf(doc: PDFKit.PDFDocument): Promise<void> {
+        return Promise.resolve();
     }
 }
-
-interface TextElementLine {
-    x: number;
-    y: number;
-    line: string;
-}
-
+/*
 export class TextElement implements RenderElement {
     private key: string
     private text: string
@@ -242,6 +285,7 @@ export class TextElement implements RenderElement {
             });
     }
 }
+ */
 
 export interface ImageElementOptions {
     x: number;

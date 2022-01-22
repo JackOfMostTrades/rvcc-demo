@@ -22,6 +22,17 @@ export interface SizeSpec {
     website?: TextSpec
     // User-specified program information text
     programInfo?: TextSpec
+
+    // Disable website input when using the default picture
+    defaultPictureWebsiteDisabled?: boolean
+
+    // When using the default picture, what extra text should be
+    // appended to the user-specified website text. Value is a map
+    // from language to extra text.
+    defaultPictureWebsiteExtraText?: {
+        fontSize?: number,
+        text: {[language: string]: string},
+    }
 }
 
 export interface BackgroundSpec {
@@ -58,9 +69,7 @@ export interface TextSpec {
 
     // Defaults to "left"
     horizontalAlignment?: 'left' | 'right' | 'center'
-    // Does the y coordinate represent the top of the text, bottom, or center. Defaults to "top".
-    verticalAlignment?: 'top' | 'bottom' | 'center'
-    // If the text has multiple lines, how should lines be distributed? Defaults to "down".
+    // Should lines flow up, down, or be centered on the y coordinate.
     lineDistribution?: 'down' | 'up' | 'center'
 
     // Defaults to false
