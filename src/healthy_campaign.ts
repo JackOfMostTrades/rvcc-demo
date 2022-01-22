@@ -80,6 +80,13 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 horizontalAlignment: 'center',
                 lineDistribution: 'center',
             },
+            defaultPictureWebsiteExtraText: {
+                fontSize: 40,
+                text: {
+                    "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
+                    "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
+                },
+            },
         },
         {
             name: "11x17",
@@ -139,6 +146,13 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 horizontalAlignment: 'center',
                 lineDistribution: 'center',
             },
+            defaultPictureWebsiteExtraText: {
+                fontSize: 40,
+                text: {
+                    "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
+                    "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
+                },
+            },
         },
         {
             name: "12x18",
@@ -197,6 +211,13 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 y: 1923,
                 horizontalAlignment: 'center',
                 lineDistribution: 'center',
+            },
+            defaultPictureWebsiteExtraText: {
+                fontSize: 40,
+                text: {
+                    "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
+                    "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
+                },
             },
         },
         {
@@ -258,6 +279,14 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 y: 1034,
                 horizontalAlignment: 'center',
                 lineDistribution: 'center',
+            },
+            defaultPictureWebsiteDisabled: true,
+            defaultPictureWebsiteExtraText: {
+                fontSize: 40,
+                text: {
+                    "english": "#lovewithcampaign",
+                    "spanish": "#lovewithcampaign",
+                },
             },
         },
     ]
