@@ -295,7 +295,15 @@ export class TemplateForm extends Component<Props, State> {
                   <label>Background</label>
                   <Select options={this.props.campaign.backgrounds.map((bg, idx) => {return {value: idx, text: bg.name}})}
                           value={this.state.background}
-                          onChange={(e, data) => this.setState({background: data.value as number})} />
+                          onChange={(e, data) => {
+                            let prevBackground = this.props.campaign.backgrounds[this.state.background];
+                            let nextBackground = this.props.campaign.backgrounds[data.value as number];
+                            let nextState: Partial<State> = {background: data.value as number};
+                            if (prevBackground.fontColor === this.state.fontColor && nextBackground.fontColor !== this.state.fontColor) {
+                              nextState.fontColor = nextBackground.fontColor;
+                            }
+                            this.setState(nextState);
+                          }} />
                 </Form.Field>
                 <Form.Group widths="equal">
                   <Form.Field>

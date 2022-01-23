@@ -38,6 +38,7 @@ export interface SizeSpec {
 export interface BackgroundSpec {
     name: string
     color: string
+    fontColor: string
 }
 
 export interface ImageSpec {
