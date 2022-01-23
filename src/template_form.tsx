@@ -311,16 +311,18 @@ export class TemplateForm extends Component<Props, State> {
                             onChange={(e, data) => this.setState({language: data.value as number})} />
                   </Form.Field>
                 </Form.Group>
-                <Form.Group widths={16}>
-                  <Form.Field width={12}>
-                    <label>Website / Social Media</label>
-                    <Input disabled={websiteInputDisabled} value={this.state.website} onChange={e => this.setState({website: e.target.value})} />
-                  </Form.Field>
-                  <Form.Field width={4}>
-                    <label>Font Size</label>
-                    <Input disabled={websiteInputDisabled} type="number" value={this.state.website_font_size} onChange={e => this.setState({website_font_size: parseInt(e.target.value)})} />
-                  </Form.Field>
-                </Form.Group>
+                {websiteInputDisabled ? null :
+                  <Form.Group widths={16}>
+                    <Form.Field width={12}>
+                      <label>Website / Social Media</label>
+                      <Input value={this.state.website} onChange={e => this.setState({website: e.target.value})} />
+                    </Form.Field>
+                    <Form.Field width={4}>
+                      <label>Font Size</label>
+                      <Input type="number" value={this.state.website_font_size} onChange={e => this.setState({website_font_size: parseInt(e.target.value)})} />
+                    </Form.Field>
+                  </Form.Group>
+                }
 
                 <Form.Group widths={16}>
                   <Form.Field width={12}>

@@ -80,8 +80,9 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 horizontalAlignment: 'center',
                 lineDistribution: 'center',
             },
+            defaultPictureWebsiteDisabled: true,
             defaultPictureWebsiteExtraText: {
-                fontSize: 40,
+                fontSize: 30,
                 text: {
                     "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
                     "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
@@ -146,8 +147,9 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 horizontalAlignment: 'center',
                 lineDistribution: 'center',
             },
+            defaultPictureWebsiteDisabled: true,
             defaultPictureWebsiteExtraText: {
-                fontSize: 40,
+                fontSize: 30,
                 text: {
                     "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
                     "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
@@ -212,8 +214,9 @@ export const HEALTHY_CAMPAIGN: Campaign = {
                 horizontalAlignment: 'center',
                 lineDistribution: 'center',
             },
+            defaultPictureWebsiteDisabled: true,
             defaultPictureWebsiteExtraText: {
-                fontSize: 40,
+                fontSize: 30,
                 text: {
                     "english": "Campaign by Recognize Violence, Change Culture (RVCC)",
                     "spanish": "Campaña de Recognize Violence, Change Culture (RVCC)",
@@ -282,7 +285,7 @@ export const HEALTHY_CAMPAIGN: Campaign = {
             },
             defaultPictureWebsiteDisabled: true,
             defaultPictureWebsiteExtraText: {
-                fontSize: 40,
+                fontSize: 20,
                 text: {
                     "english": "#lovewithcampaign",
                     "spanish": "#lovewithcampaign",
