@@ -136,8 +136,8 @@ export class TextContainer implements RenderElement {
         let getExtents = (line: TextContainerLine) => {
             setFontOnCtx(line.fontSize, line.fontFamily);
             let metrics = ctx.measureText(line.text);
-            return {width: Math.max(0, metrics.actualBoundingBoxLeft) + Math.max(0, metrics.actualBoundingBoxRight),
-                height: Math.max(0, metrics.actualBoundingBoxAscent) + Math.max(0, metrics.actualBoundingBoxDescent)};
+            return {width: metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight,
+                height: line.fontSize}
         };
         let drawRect = (color: string|undefined, x: number, y: number, width: number, height: number) => {
             ctx.fillStyle = color;
